@@ -10,7 +10,6 @@ class Project:
    def __init__(self,p,n):
      self.path = p
      self.name = n
-     self.existProject = True;
 
    @staticmethod
    def  createProject(p,n):
