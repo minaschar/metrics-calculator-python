@@ -1,66 +1,43 @@
 import ast
+from asyncore import read
 import os
 from pprint import pprint
+from project import Project
+from python_file import Python_File
 
 
 class ASTGenerator:
 
-    def __init__(self,all_trees,all_parsed_files,root_folder_path):
-        self.all_trees = all_trees
-        self.all_parsed_files = all_parsed_files
-        self.root_folder_path = root_folder_path
-        
-    def readFolder(self,root_folder_path):
-        for root, dirs, files in os.walk(root_folder_path):
-            for file in files: #Traverse all the directories
-                if file.endswith(".py"): #we want only .py files
+    project = None
+
+    def __init__(self, project):
+        self.project = project
+
+    def start_parsing(self):
+        self.readFolder()
+
+    def readFolder(self):
+        for root, dirs, files in os.walk(self.project.get_root_folder_path()):
+            for file in files:  # Traverse all the directories
+                if file.endswith(".py"):  # we want only .py files
                     full_file_path = os.path.join(root, file)
+                    # fix the path format
                     full_file_path = full_file_path.replace("\\", "/")
-                    python_file = open(full_file_path, "r", encoding='UTF8') #open text file in read mode
-                    data_from_python_file_str = python_file.read() #read whole file to a string
+                    # open text file in read mode
+                    python_file = open(full_file_path, "r", encoding='UTF8')
+                    data_from_python_file_str = python_file.read()  # read whole file to a string
                     python_file.close()
-                    self.createAST(data_from_python_file_str,file) # This is not inside a try except since the Try except is moved inside the createAST method
-                    all_parsed_files.append(file) #to know for which file the ast is for
+                    # This is not inside a try except since the Try except is moved inside the createAST method
+                    self.createAST(data_from_python_file_str, file)
 
-    def createAST(python_file_str,file):
-
-        try: 
-            tree = ast.parse(python_file_str, filename=file, mode='exec', type_comments=False, feature_version=None)
-            #tree = compile(python_file_str, filename=file, mode="exec", flags=ast.PyCF_ONLY_AST, dont_inherit=False, optimize=- 1) #Alternative
-            all_trees.append(tree)
-        except SyntaxError: 
-            all_trees.append(tree) #Here we can first convert code from python 2.0 to python 3.0
-
-
-
-all_trees = []
-all_parsed_files = []
-root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/game-master" #root folder path for testing
-
-#Creating an Object for AST parsing
-myAst = ASTGenerator(all_trees,all_parsed_files,root_folder_path)
-myAst.readFolder(root_folder_path) #Reading the folder which then leads to the creation of the AST
-
-
-# for root, dirs, files in os.walk(root_folder_path):
-#     for file in files: #Traverse all the directories
-#         if file.endswith(".py"): #we want only .py files
-#             full_file_path = os.path.join(root, file)
-#             full_file_path = full_file_path.replace("\\", "/")
-#             python_file = open(full_file_path, "r", encoding='UTF8') #open text file in read mode
-#             data_from_python_file_str = python_file.read() #read whole file to a string
-#             python_file.close()
-#             #If the program cannot be compiled then an error occurs in the console and parsing stops
-#             try: 
-#                 tree = ast.parse(data_from_python_file_str, filename=file, mode='exec', type_comments=False, feature_version=None)
-#                 #tree = compile(data_from_python_file_str, filename=file, mode="exec", flags=ast.PyCF_ONLY_AST, dont_inherit=False, optimize=- 1) #Alternative
-#                 all_trees.append(tree)
-#             except SyntaxError: 
-#                 all_trees.append(tree) #Here we can first convert code from python 2.0 to python 3.0
-#             all_parsed_files.append(file) #to know for which file the ast is for
-
-# #Just for testing
-# pprint(ast.dump(all_trees[4], indent=4))
-# print(all_parsed_files[4])
-
-
+    def createAST(self, python_file_str, file):
+        python_file = None
+        try:
+            tree = ast.parse(python_file_str, filename=file,
+                             mode='exec', type_comments=False, feature_version=None)
+            python_file = Python_File(file, tree)
+        except SyntaxError:
+            # Here we can first convert code from python 2.0 to python 3.0
+            print("not parsed")
+        if python_file != None:
+            self.project.add_python_files(python_file)
