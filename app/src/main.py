@@ -1,11 +1,14 @@
 import ast
 from pprint import pprint
+from visitor import ClassOrder
 from project import Project
 from generate_ast import ASTGenerator
 from visitor import Visitor
 
 # put here a project path to test the code
-test_root_folder_path = ""
+
+test_root_folder_path = "C:/Users/John/Desktop/game-master-t/game-master"
+
 test_project_name = "Game"
 
 project = Project(test_root_folder_path, test_project_name)
