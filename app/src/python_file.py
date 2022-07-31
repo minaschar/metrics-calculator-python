@@ -3,6 +3,7 @@ class Python_File:
 
     file_name = ""
     generated_ast = None
+    classes = []
 
     def __init__(self, file_name, generated_ast):
         self.file_name = file_name
@@ -13,3 +14,6 @@ class Python_File:
 
     def get_path(self):
         return self.file_name
+
+    def addClass(self, className):
+        self.classes.append(className)
