@@ -15,7 +15,9 @@ class Visitor(ast.NodeVisitor):
 
 
 class ClassOrder(ast.NodeVisitor):
+    
     identifiers = None
+
     def visit_ClassDef(self, node):
         self.identifiers = []
         for child in node.body:
