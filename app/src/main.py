@@ -1,11 +1,12 @@
 import ast
 from pprint import pprint
+from visitor import ClassOrder
 from project import Project
 from generate_ast import ASTGenerator
 from visitor import Visitor
 
 # put here a project path to test the code
-test_root_folder_path = "C:/Users/Money Maker/Documents/metrics-calculator-python"
+test_root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/game-master"
 test_project_name = "Game"
 
 project = Project(test_root_folder_path, test_project_name)
@@ -23,4 +24,6 @@ for python_file in project.get_files():
     pprint("---------------")
     visitor = Visitor()
     visitor.visit_ClassDef(python_file.get_generated_ast())
-    
+    order = ClassOrder()
+    order.visit(python_file.get_generated_ast())
+    print(order.identifiers)
