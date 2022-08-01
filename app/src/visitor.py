@@ -44,3 +44,15 @@ class visitor_ForFields(ast.NodeVisitor):
             if isinstance(child, ast.Assign):
                 if len(child.targets) == 1 and isinstance(child.targets[0], ast.Name):
                     print(str(child.targets[0].id))
+
+
+class visitor_ForFieldsInFunction(ast.NodeVisitor):
+
+    def visit_ClassDef(self, node):
+        for child in node.body:
+            if isinstance(child, ast.FunctionDef):
+                print('The name of fun:', child.name)
+                for fun in child.body:
+                    if isinstance(fun, ast.Assign):
+                        if len(fun.targets) == 1 and isinstance(fun.targets[0], ast.Name):
+                            print(str(fun.targets[0].id))
