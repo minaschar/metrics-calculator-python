@@ -1,4 +1,6 @@
 import ast
+from dbm import dumb
+from pprint import pprint
 
 
 class Visitor(ast.NodeVisitor):
@@ -19,8 +21,6 @@ class Visitor(ast.NodeVisitor):
 
     def visit_ClassDef(self, node: ast.AST):
 
-        print(node)
-
         # add to classNames the names of the classes
         self.classNames.append(node.name)
 
@@ -29,19 +29,18 @@ class Visitor(ast.NodeVisitor):
         print(len(self.classNames))  # visualization of the number of classes
 
 
-class ClassOrder(ast.NodeVisitor):
-
-    identifiers = None
+class visit_FunctionDef(ast.NodeVisitor):
 
     def visit_ClassDef(self, node):
-        self.identifiers = []
+        for child in node.body:
+            if isinstance(child, ast.FunctionDef):
+                print(child.name)
+
+
+class visitor_ForFields(ast.NodeVisitor):
+
+    def visit_ClassDef(self, node):
         for child in node.body:
             if isinstance(child, ast.Assign):
-                for target in child.targets:
-                    self.visit(target)
-            elif isinstance(child, ast.FunctionDef):
-                self.identifiers.append(child.name)
-
-    def visit_Name(self, node):
-        if self.identifiers is not None:
-            self.identifiers.append(node.id)
+                if len(child.targets) == 1 and isinstance(child.targets[0], ast.Name):
+                    print(str(child.targets[0].id))
