@@ -2,10 +2,9 @@
 class Python_File:
 
     file_name = ""
+    file_path = ""
     generated_ast = None
     classes = []
-    methods = []
-    fields = []
 
     def __init__(self, file_name, generated_ast):
         self.file_name = file_name
@@ -19,9 +18,3 @@ class Python_File:
 
     def addClass(self, className):
         self.classes.append(className)
-
-    def addMethod(self, methodName):
-        self.methods.append(methodName)
-
-    def addField(self, fieldName):
-        self.fields.append(fieldName)
