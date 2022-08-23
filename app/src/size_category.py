@@ -1,7 +1,7 @@
 
 class SizeCategory:
 
-    WMC = 0
+    WMC1 = 0
     NOCC = 0
     NOM = 0
     LOC = 0
