@@ -14,6 +14,7 @@ class ComplexityCategory:
     DC = 0
     TC = 0
 
+# Metrics getters
     def getDIT(self):
         return self.DIT
 
@@ -50,6 +51,7 @@ class ComplexityCategory:
     def getTC(self):
         return self.TC
 
+# Set value to the Metrics
     def setDIT(self, value):
         self.DIT = value
 
