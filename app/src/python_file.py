@@ -18,3 +18,6 @@ class Python_File:
 
     def addClass(self, className):
         self.classes.append(className)
+
+    def getFileClasses(self):
+        return self.classes
