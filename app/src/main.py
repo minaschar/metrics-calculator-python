@@ -9,8 +9,7 @@ test_root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting"
 test_project_name = "Game"
 project = Project(test_root_folder_path, test_project_name)
 
-ast_generator = ASTGenerator(project)
-ast_generator.start_parsing()
+ASTGenerator(project).start_parsing()
 
 
 # Init existing classes for each .py file of the project

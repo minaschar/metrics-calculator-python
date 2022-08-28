@@ -8,8 +8,6 @@ from python_file import Python_File
 
 class ASTGenerator:
 
-    project = None
-
     def __init__(self, project):
         self.project = project
 
@@ -36,9 +34,9 @@ class ASTGenerator:
         try:
             tree = ast.parse(python_file_str, filename=file,
                              mode='exec', type_comments=False, feature_version=None)
-            python_file = Python_File(file, full_file_path, tree)
+            python_file = Python_File(self.project, file, full_file_path, tree)
         except SyntaxError:
             # Here we can first convert code from python 2.0 to python 3.0
             print("not parsed")
         if python_file != None:
-            self.project.add_python_files(python_file)
+            self.project.add_python_file(python_file)
