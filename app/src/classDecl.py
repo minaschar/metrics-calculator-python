@@ -22,6 +22,9 @@ class Class:
     def get_fields(self):
         return self.fields
 
+    def getPyFileObj(self):
+        return self.pyFileObj
+
     def add_method(self, method):
         self.methods.append(method)
 
