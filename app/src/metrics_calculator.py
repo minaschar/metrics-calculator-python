@@ -9,4 +9,4 @@ class MetricsCalculator:
         self.calcWMC1()
 
     def calcWMC1(self):
-        self.classObj.getSizeCategoryMetrics().setWMC(len(self.classObj.get_methods()))
+        self.classObj.getSizeCategoryMetrics().setWMC1(len(self.classObj.get_methods()))
