@@ -28,14 +28,15 @@ class ASTGenerator:
                     data_from_python_file_str = python_file.read()  # read whole file to a string
                     python_file.close()
                     # This is not inside a try except since the Try except is moved inside the createAST method
-                    self.createAST(data_from_python_file_str, file)
+                    self.createAST(data_from_python_file_str,
+                                   file, full_file_path)
 
-    def createAST(self, python_file_str, file):
+    def createAST(self, python_file_str, file, full_file_path):
         python_file = None
         try:
             tree = ast.parse(python_file_str, filename=file,
                              mode='exec', type_comments=False, feature_version=None)
-            python_file = Python_File(file, tree)
+            python_file = Python_File(file, full_file_path, tree)
         except SyntaxError:
             # Here we can first convert code from python 2.0 to python 3.0
             print("not parsed")

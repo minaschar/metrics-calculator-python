@@ -1,10 +1,10 @@
-from pprint import pprint
+from metrics_calculator import MetricsCalculator
 from project import Project
 from generate_ast import ASTGenerator
 from visitor import *
 
 # put here a project path to test the code
-test_root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/game-master"
+test_root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting"
 
 test_project_name = "Game"
 project = Project(test_root_folder_path, test_project_name)
@@ -12,24 +12,27 @@ project = Project(test_root_folder_path, test_project_name)
 ast_generator = ASTGenerator(project)
 ast_generator.start_parsing()
 
-# Count classes in each module
-for python_file in project.get_files():
 
-    pprint("---------------")
-    pprint(python_file.get_path())
-    visitor = Visitor()
-    visitor.visit(python_file.get_generated_ast())
-
-# get methods for each class
+# Init existing classes for each .py file of the project
 for python_file in project.get_files():
-    print(python_file.file_name + "::: methods")
-    visit_FunctionDef().visit(python_file.get_generated_ast())
+    visit_Class().visit_ClassDef(python_file.get_generated_ast(), python_file)
 
-# get fields for each class
+# Calculate Metrics for each class
 for python_file in project.get_files():
-    print(python_file.file_name + "::: field")
-    visitor_ForFields().visit(python_file.get_generated_ast())
+    for classObj in python_file.getFileClasses():
+        MetricsCalculator(classObj)
 
+
+# Testing - print Data
 for python_file in project.get_files():
-    print(python_file.file_name + "::: field in function")
-    visitor_ForFieldsInFunction().visit(python_file.get_generated_ast())
+    for classObj in python_file.getFileClasses():
+        print(f"Class: {classObj.get_name()}")
+        for method in classObj.get_methods():
+            print(f"  Method: {method}")
+        for field in classObj.get_fields():
+            print(f"  Fields: {field}")
+
+# Testing - print Metrics
+for python_file in project.get_files():
+    for classObj in python_file.getFileClasses():
+        print(classObj.getSizeCategoryMetrics().getWMC())

@@ -16,7 +16,7 @@ class SizeCategory:
 
 # Metrics getters
     def getWMC(self):
-        return self.WMC
+        return self.WMC1
 
     def getNOCC(self):
         return self.NOCC
@@ -53,7 +53,7 @@ class SizeCategory:
 
 # Set value to the Metrics
     def setWMC(self, value):
-        self.WMC = value
+        self.WMC1 = value
 
     def setNOCC(self, value):
         self.NOCC = value
