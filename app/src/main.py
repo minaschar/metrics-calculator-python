@@ -35,3 +35,4 @@ for python_file in project.get_files():
 for python_file in project.get_files():
     for classObj in python_file.getFileClasses():
         print(classObj.getSizeCategoryMetrics().getWMC1())
+        print(classObj.getSizeCategoryMetrics().getNOM())
