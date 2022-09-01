@@ -16,3 +16,7 @@ class MetricsCalculator:
     # Need changes
     def calcWMC1(self):
         self.classObj.getSizeCategoryMetrics().setWMC1(len(self.classObj.get_methods()))
+
+    # Count the number of methods and fields for each class in the project
+    def calcSIZE2(self):
+        self.classObj.getSizeCategoryMetrics().setSIZE2(len(self.classObj.get_methods())+len(self.classObj.get_fields()))
