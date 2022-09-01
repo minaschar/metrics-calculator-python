@@ -8,6 +8,7 @@ class MetricsCalculator:
         self.classObj = classObj
         self.calcWMC1()
         self.calcNOM()
+        self.calcSIZE2()
 
     # Count the number of methods for each class in the project
     def calcNOM(self):
