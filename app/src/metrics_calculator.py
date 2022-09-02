@@ -1,17 +1,22 @@
 from classDecl import Class
-from size_category import SizeCategory
 
 
 # In this class exists methods that calculates metrics for each class
 class MetricsCalculator:
 
-    classes = []
-
     def __init__(self, classObj: Class):
         self.classObj = classObj
         self.calcWMC1()
         self.calcNOM()
-        # self.calcNOC()
+        self.calcSIZE2()
+
+    @staticmethod
+    def calcNOC(files):
+        noc = 0
+        for python_file in files:
+            noc += len(python_file.getFileClasses())
+
+        return noc
 
     # Count the number of methods for each class in the project
     def calcNOM(self):
@@ -21,6 +26,7 @@ class MetricsCalculator:
     def calcWMC1(self):
         self.classObj.getSizeCategoryMetrics().setWMC1(len(self.classObj.get_methods()))
 
-    @staticmethod
-    def calcNOC(classes, sc):
-        sc.setNOC(len(classes))
+    # Count the number of methods and fields for each class in the project
+    def calcSIZE2(self):
+        self.classObj.getSizeCategoryMetrics().setSIZE2(
+            len(self.classObj.get_methods())+len(self.classObj.get_fields()))

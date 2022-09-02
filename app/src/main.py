@@ -16,19 +16,14 @@ ASTGenerator(project).start_parsing()
 for python_file in project.get_files():
     visit_Class().visit_ClassDef(python_file.get_generated_ast(), python_file)
 
-classes = []
-
 
 # Calculate Metrics for each class
 for python_file in project.get_files():
     for classObj in python_file.getFileClasses():
         MetricsCalculator(classObj)
-        classes.append(classes)
 
 
-sc = SizeCategory()
-
-MetricsCalculator.calcNOC(classes, sc)
+MetricsCalculator.calcNOC(project.get_files())
 
 
 # Testing - print Data
@@ -45,3 +40,4 @@ for python_file in project.get_files():
     for classObj in python_file.getFileClasses():
         print(classObj.getSizeCategoryMetrics().getWMC1())
         print(classObj.getSizeCategoryMetrics().getNOM())
+        print(classObj.getSizeCategoryMetrics().getSIZE2())

@@ -11,7 +11,6 @@ class SizeCategory:
     NOP = 0
     CIS = 0
     NPM = 0
-    NOC = 0
     WAC = 0
 
 # Metrics getters
@@ -44,9 +43,6 @@ class SizeCategory:
 
     def getNPM(self):
         return self.NPM
-
-    def getNOC(self):
-        return self.NOC
 
     def getWAC(self):
         return self.WAC
@@ -81,9 +77,6 @@ class SizeCategory:
 
     def setNPM(self, value):
         self.NPM = value
-
-    def setNOC(self, value):
-        self.NOC = value
 
     def setWAC(self, value):
         self.WAC = value
