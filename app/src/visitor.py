@@ -23,7 +23,7 @@ class visit_Class(ast.NodeVisitor):
                 # passing as argument the instance and the node of the current class to the constructor and to the visitor method respectively
                 visit_FunctionDef(classObj).visit(child)
                 # Here we call visitor to add class fields
-                visit_ClassFields(classObj).visit(child)
+                visit_FieldsInClass(classObj).visit(child)
 
 
 class visit_FunctionDef(ast.NodeVisitor):
@@ -40,16 +40,17 @@ class visit_FunctionDef(ast.NodeVisitor):
                 self.classObj.add_method(child.name)
 
 
-class visit_ClassFields(ast.NodeVisitor):
+class visit_FieldsInClass(ast.NodeVisitor):
 
     def __init__(self, classObj: Class):
         self.classObj = classObj
 
-    # With this visitor we traverse the currect class node to find the constructor and then the fields that are declared into it
-    # Calculate only fields that are declared in the contructor
+    # With this visitor we traverse the currect class node to find:
+    # 1. The constructor and then the fields that are declared into it for instance fields and
+    # 2. assignments that are class fields and declared outside the constructor
     def visit_ClassDef(self, node):
         for child in node.body:
-            if isinstance(child, ast.FunctionDef):
+            if (isinstance(child, ast.FunctionDef)):
                 # We want to visit only the constructor to take tha fields that declared there
                 if (child.name == "__init__"):
                     for child in child.body:
@@ -57,7 +58,10 @@ class visit_ClassFields(ast.NodeVisitor):
                             if len(child.targets) == 1 and isinstance(child.targets[0], ast.Attribute):
                                 self.classObj.add_field(
                                     str(child.targets[0].attr))
-
+            elif (isinstance(child, ast.Assign)):
+                # We add class fields that are declared outside the contructor
+                if len(child.targets) == 1 and isinstance(child.targets[0], ast.Name):
+                    self.classObj.add_field(str(child.targets[0].id))
 
 # class visitor_ForFieldsInFunction(ast.NodeVisitor):
 
