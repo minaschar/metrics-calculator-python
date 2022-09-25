@@ -16,7 +16,7 @@ class visit_Class(ast.NodeVisitor):
             # We want only classes in python Files
             if (isinstance(child, ast.ClassDef)):
                 # We found a class, so we create a Class object and we added it to the list of classes of the specific .py file
-                classObj = Class(child.name, pythonFile, CohesionCategory(),
+                classObj = Class(child.name, pythonFile, child, CohesionCategory(),
                                  ComplexityCategory(), CouplingCategory(), QMOODCategory(), SizeCategory())
                 pythonFile.addClass(classObj)
                 # For this class, we want to find it's methods, so we call the other visitor to traverse the method,
@@ -51,7 +51,7 @@ class visit_FieldsInClass(ast.NodeVisitor):
     def visit_ClassDef(self, node):
         for child in node.body:
             if (isinstance(child, ast.FunctionDef)):
-                # We want to visit only the constructor to take tha fields that declared there
+                # We want to visit only the constructor to take tha fields that declared there (instance fields)
                 if (child.name == "__init__"):
                     for child in child.body:
                         if (isinstance(child, ast.Assign)):
@@ -59,7 +59,7 @@ class visit_FieldsInClass(ast.NodeVisitor):
                                 self.classObj.add_field(
                                     str(child.targets[0].attr))
             elif (isinstance(child, ast.Assign)):
-                # We add class fields that are declared outside the contructor
+                # We add class fields that are declared outside the contructor (class fields)
                 if len(child.targets) == 1 and isinstance(child.targets[0], ast.Name):
                     self.classObj.add_field(str(child.targets[0].id))
 

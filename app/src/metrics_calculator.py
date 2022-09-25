@@ -24,7 +24,7 @@ class MetricsCalculator:
     def calcNOM(self):
         self.classObj.getSizeCategoryMetrics().setNOM(len(self.classObj.get_methods()))
 
-    # Need changes
+    # Count the number of methods for each class in the project
     def calcWMC1(self):
         self.classObj.getSizeCategoryMetrics().setWMC1(len(self.classObj.get_methods()))
 

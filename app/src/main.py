@@ -35,6 +35,7 @@ print(f"Classes in Project: {MetricsCalculator.calcNOC(project.get_files())}")
 
 for python_file in project.get_files():
     for classObj in python_file.getFileClasses():
+        print(f"Class name: {classObj.getClassAstNode().name}")
         print(classObj.getSizeCategoryMetrics().getWMC1())
         print(classObj.getSizeCategoryMetrics().getNOM())
         print(classObj.getSizeCategoryMetrics().getSIZE2())
