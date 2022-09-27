@@ -9,6 +9,7 @@ class MetricsCalculator:
         self.calcWMC1()
         self.calcNOM()
         self.calcSIZE2()
+        self.calcWAC()
 
     # Count the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
@@ -32,3 +33,7 @@ class MetricsCalculator:
     def calcSIZE2(self):
         self.classObj.getSizeCategoryMetrics().setSIZE2(
             len(self.classObj.get_methods()) + len(self.classObj.get_fields()))
+            
+    #Count the number of fields for each class
+    def calcWAC(self):
+        self.classObj.getSizeCategoryMetrics().setWAC(len(self.classObj.get_fields()))

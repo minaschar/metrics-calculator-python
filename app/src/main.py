@@ -5,7 +5,7 @@ from visitor import *
 
 # put here a project path to test the code
 # C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting (path for Minas's testing)
-test_root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting"
+test_root_folder_path = "C:/Users/John/Desktop/game-master-t"
 
 test_project_name = "Game"
 project = Project(test_root_folder_path, test_project_name)
@@ -21,21 +21,26 @@ for python_file in project.get_files():
     for classObj in python_file.getFileClasses():
         MetricsCalculator(classObj)
 
-# Testing - print Data
-for python_file in project.get_files():
-    for classObj in python_file.getFileClasses():
-        print(f"Class: {classObj.get_name()}")
-        for method in classObj.get_methods():
-            print(f"  Method: {method}")
-        for field in classObj.get_fields():
-            print(f"  Fields: {field}")
+# # Testing - print Data
+# for python_file in project.get_files():
+#     for classObj in python_file.getFileClasses():
+#         print(f"Class: {classObj.get_name()}")
+#         for method in classObj.get_methods():
+#             print(f"  Method: {method}")
+#         for field in classObj.get_fields():
+#             print(f"  Fields: {field}")
 
-# Testing - print Metrics
-print(f"Classes in Project: {MetricsCalculator.calcNOC(project.get_files())}")
+# # Testing - print Metrics
+# print(f"Classes in Project: {MetricsCalculator.calcNOC(project.get_files())}")
 
 for python_file in project.get_files():
-    for classObj in python_file.getFileClasses():
-        print(f"Class name: {classObj.getClassAstNode().name}")
-        print(classObj.getSizeCategoryMetrics().getWMC1())
-        print(classObj.getSizeCategoryMetrics().getNOM())
-        print(classObj.getSizeCategoryMetrics().getSIZE2())
+     for classObj in python_file.getFileClasses():
+          print(f"Class name: {classObj.getClassAstNode().name}")
+          print(classObj.getSizeCategoryMetrics().getWMC1())
+          print(classObj.getSizeCategoryMetrics().getNOM())
+          print(classObj.getSizeCategoryMetrics().getSIZE2())
+          print(classObj.getSizeCategoryMetrics().getWAC())
+
+
+
+        
