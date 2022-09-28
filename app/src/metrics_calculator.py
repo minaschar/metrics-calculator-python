@@ -1,3 +1,5 @@
+from os import listdir
+from os.path import isfile, join
 from classDecl import Class
 
 
@@ -10,6 +12,8 @@ class MetricsCalculator:
         self.calcNOM()
         self.calcSIZE2()
         self.calcWAC()
+        # Testing that that the LOC counter works
+        print(self.calcLOC())
 
     # Count the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
@@ -33,7 +37,33 @@ class MetricsCalculator:
     def calcSIZE2(self):
         self.classObj.getSizeCategoryMetrics().setSIZE2(
             len(self.classObj.get_methods()) + len(self.classObj.get_fields()))
-            
-    #Count the number of fields for each class
+
+    # Count the number of fields for each class
     def calcWAC(self):
         self.classObj.getSizeCategoryMetrics().setWAC(len(self.classObj.get_fields()))
+
+    def calcLOC(self):
+        # project path to test the code
+        # C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting (path for Minas' testing)
+        # C:/Users/John/Desktop/game-master-t (path for Panos' testing)
+        # C:/Users/Money Maker/Documents/ProjectForTesting (path for Dionisis' testing)
+        return self.countIn("C:/Users/Money Maker/Documents/ProjectForTesting")
+
+##################### Methods necessary for LOC calculation #####################
+    def countLinesInPath(self, path, directory):
+        count = 0
+        for line in open(join(directory, path), encoding="utf8"):
+            count += 1
+        return count
+
+    def countLines(self, paths, directory):
+        count = 0
+        for path in paths:
+            count = count + self.countLinesInPath(path, directory)
+        return count
+
+    def getPaths(self, directory):
+        return [f for f in listdir(directory) if isfile(join(directory, f))]
+
+    def countIn(self, directory):
+        return self.countLines(self.getPaths(directory), directory)

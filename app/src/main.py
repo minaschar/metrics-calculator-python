@@ -3,9 +3,11 @@ from project import Project
 from generate_ast import ASTGenerator
 from visitor import *
 
-# put here a project path to test the code
-# C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting (path for Minas's testing)
-test_root_folder_path = "C:/Users/John/Desktop/game-master-t"
+# project path to test the code
+# C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting (path for Minas' testing)
+# C:/Users/John/Desktop/game-master-t (path for Panos' testing)
+# C:/Users/Money Maker/Documents/ProjectForTesting (path for Dionisis' testing)
+test_root_folder_path = "C:/Users/Money Maker/Documents/ProjectForTesting"
 
 test_project_name = "Game"
 project = Project(test_root_folder_path, test_project_name)
@@ -34,13 +36,9 @@ for python_file in project.get_files():
 # print(f"Classes in Project: {MetricsCalculator.calcNOC(project.get_files())}")
 
 for python_file in project.get_files():
-     for classObj in python_file.getFileClasses():
-          print(f"Class name: {classObj.getClassAstNode().name}")
-          print(classObj.getSizeCategoryMetrics().getWMC1())
-          print(classObj.getSizeCategoryMetrics().getNOM())
-          print(classObj.getSizeCategoryMetrics().getSIZE2())
-          print(classObj.getSizeCategoryMetrics().getWAC())
-
-
-
-        
+    for classObj in python_file.getFileClasses():
+        print(f"Class name: {classObj.getClassAstNode().name}")
+        print(classObj.getSizeCategoryMetrics().getWMC1())
+        print(classObj.getSizeCategoryMetrics().getNOM())
+        print(classObj.getSizeCategoryMetrics().getSIZE2())
+        print(classObj.getSizeCategoryMetrics().getWAC())
