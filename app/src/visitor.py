@@ -63,18 +63,43 @@ class visit_FieldsInClass(ast.NodeVisitor):
                 if len(child.targets) == 1 and isinstance(child.targets[0], ast.Name):
                     self.classObj.add_field(str(child.targets[0].id))
 
-# class visitor_ForFieldsInFunction(ast.NodeVisitor):
 
-#     def visit_ClassDef(self, node):
-#         for child in node.body:
-#             if isinstance(child, ast.FunctionDef):
-#                 print('The name of fun:', child.name)
-#                 self.visit_FunctionDef(child)
+class visit_methodsForLCOM(ast.NodeVisitor):
 
-#     def visit_FunctionDef(self, node):
-#         for child in node.body:
-#             if isinstance(child, ast.Assign):
-#                 if len(child.targets) == 1 and isinstance(child.targets[0], ast.Attribute):
-#                     print(str(child.targets[0].attr))
-#                 if len(child.targets) == 1 and isinstance(child.targets[0], ast.Name):
-#                     print(str(child.targets[0].id))
+    def __init__(self, classObj: Class):
+        # A dictionary with key the function name and with value a list with the fields/attrs that the function uses
+        self.uses_in_method = {}
+        self.classObj = classObj
+
+    def visit_ClassDef(self, node):
+        for child in node.body:
+            if isinstance(child, ast.FunctionDef):
+                self.visit_FunctionDef(child)
+        # return the dictionary after walk to all class node
+        return self.uses_in_method
+
+    def visit_FunctionDef(self, node):
+        values = []
+        for child in node.body:
+            exp = ""
+            if isinstance(child, ast.Assign):
+                if len(child.targets) == 1 and isinstance(child.targets[0], ast.Attribute):
+                    exp = str(child.targets[0].attr)
+                if len(child.targets) == 1 and isinstance(child.targets[0], ast.Name):
+                    exp = str(child.targets[0].id)
+            elif (isinstance(child, ast.AugAssign)):
+                if isinstance(child.target, ast.Attribute):
+                    exp = str(child.target.attr)
+                if isinstance(child.target, ast.Name):
+                    exp = str(child.target.id)
+            elif (isinstance(child, ast.Expr)):
+                for i in range(0, len(child.value.args), 1):
+                    if (isinstance(child.value.args[i], ast.BinOp)):
+                        exp = child.value.args[i].right.attr
+                    elif (isinstance(child.value.args[i], ast.Attribute)):
+                        exp = child.value.args[i].attr
+
+            if (exp != "" and exp in self.classObj.get_fields()):
+                values.append(exp)
+
+        self.uses_in_method[node.name] = values

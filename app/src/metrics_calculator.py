@@ -1,6 +1,7 @@
 from os import listdir
 from os.path import isfile, join
 from classDecl import Class
+from visitor import visit_methodsForLCOM
 
 
 # In this class exists methods that calculates metrics for the whole project
@@ -12,6 +13,7 @@ class MetricsCalculator:
         self.calcNOM()
         self.calcSIZE2()
         self.calcWAC()
+        self.calcLCOM()
         # Testing that that the LOC counter works
         print(self.calcLOC())
 
@@ -42,12 +44,29 @@ class MetricsCalculator:
     def calcWAC(self):
         self.classObj.getSizeCategoryMetrics().setWAC(len(self.classObj.get_fields()))
 
+    # Calculate LCOM Metric
+    def calcLCOM(self):
+        cohesive = 0
+        non_cohesive = 0
+
+        uses_in_methods = visit_methodsForLCOM(
+            self.classObj).visit(self.classObj.getClassAstNode())
+
+        for i in range(0, len(uses_in_methods), 1):
+            for j in range(i + 1, len(uses_in_methods), 1):
+                if (len(list(set(list(uses_in_methods.values())[i]).intersection(
+                        list(uses_in_methods.values())[j])))) == 0:
+                    non_cohesive += 1
+                else:
+                    cohesive += 1
+
+        if (non_cohesive - cohesive < 0):
+            self.classObj.getCohesionCategoryMetrics().set_LCOM(0)
+        else:
+            self.classObj.getCohesionCategoryMetrics().set_LCOM(non_cohesive - cohesive)
+
     def calcLOC(self):
-        # project path to test the code
-        # C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting (path for Minas' testing)
-        # C:/Users/John/Desktop/game-master-t (path for Panos' testing)
-        # C:/Users/Money Maker/Documents/ProjectForTesting (path for Dionisis' testing)
-        return self.countIn("C:/Users/Money Maker/Documents/ProjectForTesting")
+        return self.countIn(self.classObj.getPyFileObj().getProject().get_root_folder_path())
 
 ##################### Methods necessary for LOC calculation #####################
     def countLinesInPath(self, path, directory):

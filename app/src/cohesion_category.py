@@ -14,9 +14,7 @@ class CohesionCategory:
     def get_NOT(self):
         return self.NOT
 
-
 # Calculating the Metrics
-
     def set_LCOM(self, value):
         self.LCOM = value
 
