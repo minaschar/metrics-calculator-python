@@ -1,4 +1,5 @@
 import ast
+from sys import orig_argv
 from cohesion_category import CohesionCategory
 from coupling_category import CouplingCategory
 from qmood_category import QMOODCategory
@@ -6,6 +7,27 @@ from size_category import SizeCategory
 from complexity_category import ComplexityCategory
 from python_file import Python_File
 from classDecl import *
+
+
+class Init_Visitor(ast.NodeVisitor):
+
+    # Visit the node of the whole .py file
+    def visit_Module(self, node):
+        # We need for loop because in one .py file can be more than one classes
+        for child in node.body:
+            # We want to start analyzing only for classes and no for non oop code
+            if (isinstance(child, ast.ClassDef)):
+                print(child.name)
+                self.generic_visit(child)
+
+    # Visit the node of a class
+    def visit_ClassDef(self, node):
+        print(node)
+        self.generic_visit(node)
+
+    # Visit the node of a method in a class
+    def visit_FunctionDef(self, node):
+        print(node.name)
 
 
 class visit_Class(ast.NodeVisitor):

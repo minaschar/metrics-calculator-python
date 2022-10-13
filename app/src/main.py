@@ -16,7 +16,8 @@ ASTGenerator(project).start_parsing()
 
 # Init existing classes for each .py file of the project
 for python_file in project.get_files():
-    visit_Class().visit_ClassDef(python_file.get_generated_ast(), python_file)
+    Init_Visitor().visit_Module(python_file.get_generated_ast())
+    # visit_Class().visit_ClassDef(python_file.get_generated_ast(), python_file)
 
 # Calculate Metrics for each class
 for python_file in project.get_files():
