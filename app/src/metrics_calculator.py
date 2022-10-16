@@ -2,7 +2,6 @@ from os import listdir
 from os.path import isfile, join
 from visitor import LCOM_Visitor
 from classDecl import Class
-from visitor import visit_methodsForLCOM
 
 
 # In this class exists methods that calculates metrics for the whole project
