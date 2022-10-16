@@ -1,5 +1,6 @@
 from os import listdir
 from os.path import isfile, join
+from visitor import LCOM_Visitor
 from classDecl import Class
 from visitor import visit_methodsForLCOM
 
@@ -14,8 +15,7 @@ class MetricsCalculator:
         self.calcSIZE2()
         self.calcWAC()
         self.calcLCOM()
-        # Testing that that the LOC counter works
-        print(self.calcLOC())
+        self.calcLOC()
 
     # Count the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
@@ -49,13 +49,11 @@ class MetricsCalculator:
         cohesive = 0
         non_cohesive = 0
 
-        uses_in_methods = visit_methodsForLCOM(
-            self.classObj).visit(self.classObj.getClassAstNode())
+        uses_in_methods = LCOM_Visitor(self.classObj).visit(self.classObj.getClassAstNode())
 
         for i in range(0, len(uses_in_methods), 1):
             for j in range(i + 1, len(uses_in_methods), 1):
-                if (len(list(set(list(uses_in_methods.values())[i]).intersection(
-                        list(uses_in_methods.values())[j])))) == 0:
+                if (len(list(set(list(uses_in_methods.values())[i]).intersection(list(uses_in_methods.values())[j])))) == 0:
                     non_cohesive += 1
                 else:
                     cohesive += 1
@@ -65,8 +63,9 @@ class MetricsCalculator:
         else:
             self.classObj.getCohesionCategoryMetrics().set_LCOM(non_cohesive - cohesive)
 
+    # Calculate LOC Metric
     def calcLOC(self):
-        return self.countIn(self.classObj.getPyFileObj().getProject().get_root_folder_path())
+        self.classObj.getSizeCategoryMetrics().setLOC(self.countIn(self.classObj.getPyFileObj().getProject().get_root_folder_path()))
 
 ##################### Methods necessary for LOC calculation #####################
     def countLinesInPath(self, path, directory):

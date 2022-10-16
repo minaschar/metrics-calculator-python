@@ -25,7 +25,6 @@ class Init_Visitor(ast.NodeVisitor):
 
     # Visit the node of a class
     def visit_ClassDef(self, node):
-        print(node.name)
         # Create class instance
         classObj = Class(node.name, self.python_file, node, CohesionCategory(), ComplexityCategory(), CouplingCategory(), QMOODCategory(), SizeCategory())
         self.currClass = classObj
@@ -40,7 +39,6 @@ class Init_Visitor(ast.NodeVisitor):
 
     # Visit the node of a method in a class
     def visit_FunctionDef(self, node):
-        print(node.name)
         self.currClass.add_method(node.name)
         self.generic_visit(node)
 
@@ -55,12 +53,10 @@ class Init_Visitor(ast.NodeVisitor):
         if (isinstance(node.ctx, ast.Store)):
             # Instance attributes
             if (node.value.id == "self"):
-                print(node.attr)
-                self.currClass.add_instanceAttribute(node.attr)
+                self.currClass.add_field("self." + node.attr)
             # Class attributes that declared inside a method
-            else:
-                print(node.attr)
-                self.currClass.add_classAttribute(node.attr)
+            elif (node.value.id == self.currClass.get_name()):
+                self.currClass.add_field(self.currClass.get_name() + "." + node.attr)
 
 
 class AttrVisitor(ast.NodeVisitor):
@@ -71,8 +67,34 @@ class AttrVisitor(ast.NodeVisitor):
     # Visitor to get ONLY class attributes that declared outside of methods!
     def visit_Name(self, node):
         if (isinstance(node.ctx, ast.Store)):
-            print(node.id)
-            self.classObj.add_classAttribute(node.id)
+            self.classObj.add_field(self.classObj.get_name() + "." + node.id)
+
+
+class LCOM_Visitor(ast.NodeVisitor):
+
+    def __init__(self, classObj):
+        self.classObj = classObj
+        self.uses_in_method = {}  # A dictionary with key the function name and with value a list with the fields/attrs that the func
+        self.fields = set()  # Keeps class and instance attributes for the current method
+
+    def visit_ClassDef(self, node):
+        for child in node.body:
+            if (isinstance(child, ast.FunctionDef)):
+                self.visit_FunctionDef(child)
+        return self.uses_in_method
+
+    def visit_FunctionDef(self, node):
+        self.generic_visit(node)
+        self.uses_in_method[node.name] = self.fields.copy()
+        self.fields.clear()  # Clear the set to can be used from the next method
+
+    def visit_Attribute(self, node):
+        # Instance attributes
+        if (node.value.id == "self"):
+            self.fields.add("self." + node.attr)
+        # Class attributes that declared inside a method
+        elif (node.value.id == self.classObj.get_name()):
+            self.fields.add(self.classObj.get_name() + "." + node.attr)
 
 
 class visit_methodsForLCOM(ast.NodeVisitor):

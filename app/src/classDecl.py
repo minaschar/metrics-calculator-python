@@ -7,8 +7,7 @@ class Class:
         self.pyFileObj = pyFileObj
         self.classAstNode = classAstNode
         self.methods = []
-        self.classAttributes = set()
-        self.instanceAttributes = set()
+        self.fields = set()  # All class attributes and instance attributes
         self.cohesionCategoryMetrics = cohesionCategoryMetrics
         self.complexityCategoryMetrics = complexityCategoryMetrics
         self.couplingCategoryMetrics = couplingCategoryMetrics
@@ -29,20 +28,14 @@ class Class:
     def get_methods(self):
         return self.methods
 
-    def get_classAttributes(self):
-        return self.classAttributes
-
-    def get_instanceAttributes(self):
-        return self.instanceAttributes
+    def get_fields(self):
+        return self.fields
 
     def add_method(self, method):
         self.methods.append(method)
 
-    def add_classAttribute(self, field):
-        self.classAttributes.add(field)
-
-    def add_instanceAttribute(self, field):
-        self.instanceAttributes.add(field)
+    def add_field(self, field):
+        self.fields.add(field)
 
     def getCohesionCategoryMetrics(self):
         return self.cohesionCategoryMetrics
