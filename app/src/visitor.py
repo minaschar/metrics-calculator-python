@@ -22,7 +22,13 @@ class Init_Visitor(ast.NodeVisitor):
     # Visit the node of a class
     def visit_ClassDef(self, node):
         print(node.name)
-        self.generic_visit(node)
+        for child in node.body:
+            # We will visit the whole node of a method
+            if (isinstance(child, ast.FunctionDef)):
+                self.visit_FunctionDef(child)
+            else:
+                # In else, we are outside of the methods, so we will visit this part
+                AttrVisitor().visit(child)
 
     # Visit the node of a method in a class
     def visit_FunctionDef(self, node):
@@ -35,12 +41,20 @@ class Init_Visitor(ast.NodeVisitor):
     def visit_AnnAssign(self, node):
         self.generic_visit(node)
 
-    # Visitor to get ONLY instance attributes!
+    # Visitor to get instance attributes and class attributes that declared in method's body!
     def visit_Attribute(self, node):
-        if (node.value.id == "self"):
-            print(node.attr)
+        if (isinstance(node.ctx, ast.Store)):
+            # Instance attributes
+            if (node.value.id == "self"):
+                print(node.attr)
+            # Class attributes that declared inside a method
+            else:
+                print(node.attr)
 
-    # Visitor to get ONLY class attributes!
+
+class AttrVisitor(ast.NodeVisitor):
+
+    # Visitor to get ONLY class attributes that declared outside of methods!
     def visit_Name(self, node):
         if (isinstance(node.ctx, ast.Store)):
             print(node.id)
