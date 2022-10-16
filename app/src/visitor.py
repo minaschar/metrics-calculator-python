@@ -11,6 +11,10 @@ from classDecl import *
 
 class Init_Visitor(ast.NodeVisitor):
 
+    def __init__(self, python_file):
+        self.python_file = python_file
+        self.currClass = None
+
     # Visit the node of the whole .py file
     def visit_Module(self, node):
         # We need for loop because in one .py file can be more than one classes
@@ -22,17 +26,22 @@ class Init_Visitor(ast.NodeVisitor):
     # Visit the node of a class
     def visit_ClassDef(self, node):
         print(node.name)
+        # Create class instance
+        classObj = Class(node.name, self.python_file, node, CohesionCategory(), ComplexityCategory(), CouplingCategory(), QMOODCategory(), SizeCategory())
+        self.currClass = classObj
+        self.python_file.addClass(classObj)
         for child in node.body:
             # We will visit the whole node of a method
             if (isinstance(child, ast.FunctionDef)):
                 self.visit_FunctionDef(child)
             else:
                 # In else, we are outside of the methods, so we will visit this part
-                AttrVisitor().visit(child)
+                AttrVisitor(classObj).visit(child)
 
     # Visit the node of a method in a class
     def visit_FunctionDef(self, node):
         print(node.name)
+        self.currClass.add_method(node.name)
         self.generic_visit(node)
 
     def visit_Assign(self, node):
@@ -47,73 +56,23 @@ class Init_Visitor(ast.NodeVisitor):
             # Instance attributes
             if (node.value.id == "self"):
                 print(node.attr)
+                self.currClass.add_instanceAttribute(node.attr)
             # Class attributes that declared inside a method
             else:
                 print(node.attr)
+                self.currClass.add_classAttribute(node.attr)
 
 
 class AttrVisitor(ast.NodeVisitor):
+
+    def __init__(self, classObj):
+        self.classObj = classObj
 
     # Visitor to get ONLY class attributes that declared outside of methods!
     def visit_Name(self, node):
         if (isinstance(node.ctx, ast.Store)):
             print(node.id)
-
-
-class visit_Class(ast.NodeVisitor):
-
-    # Traverse the whole ast of the python file
-    def visit_ClassDef(self, node: ast.AST, pythonFile: Python_File):
-        for child in node.body:
-            # We want only classes in python Files
-            if (isinstance(child, ast.ClassDef)):
-                # We found a class, so we create a Class object and we added it to the list of classes of the specific .py file
-                classObj = Class(child.name, pythonFile, child, CohesionCategory(),
-                                 ComplexityCategory(), CouplingCategory(), QMOODCategory(), SizeCategory())
-                pythonFile.addClass(classObj)
-                # For this class, we want to find it's methods, so we call the other visitor to traverse the method,
-                # passing as argument the instance and the node of the current class to the constructor and to the visitor method respectively
-                visit_FunctionDef(classObj).visit(child)
-                # Here we call visitor to add class fields
-                visit_FieldsInClass(classObj).visit(child)
-
-
-class visit_FunctionDef(ast.NodeVisitor):
-
-    def __init__(self, classObj: Class):
-        self.classObj = classObj
-
-    # With this visitor we will traverse the node of the body of the class
-    def visit_ClassDef(self, node):
-        for child in node.body:
-            # We want only methods
-            if isinstance(child, ast.FunctionDef):
-                # Add method name to the list of methods of the current class we traverse
-                self.classObj.add_method(child.name)
-
-
-class visit_FieldsInClass(ast.NodeVisitor):
-
-    def __init__(self, classObj: Class):
-        self.classObj = classObj
-
-    # With this visitor we traverse the currect class node to find:
-    # 1. The constructor and then the fields that are declared into it for instance fields and
-    # 2. assignments that are class fields and declared outside the constructor
-    def visit_ClassDef(self, node):
-        for child in node.body:
-            if (isinstance(child, ast.FunctionDef)):
-                # We want to visit only the constructor to take tha fields that declared there (instance fields)
-                if (child.name == "__init__"):
-                    for child in child.body:
-                        if (isinstance(child, ast.Assign)):
-                            if len(child.targets) == 1 and isinstance(child.targets[0], ast.Attribute):
-                                self.classObj.add_field(
-                                    str(child.targets[0].attr))
-            elif (isinstance(child, ast.Assign)):
-                # We add class fields that are declared outside the contructor (class fields)
-                if len(child.targets) == 1 and isinstance(child.targets[0], ast.Name):
-                    self.classObj.add_field(str(child.targets[0].id))
+            self.classObj.add_classAttribute(node.id)
 
 
 class visit_methodsForLCOM(ast.NodeVisitor):

@@ -7,7 +7,8 @@ class Class:
         self.pyFileObj = pyFileObj
         self.classAstNode = classAstNode
         self.methods = []
-        self.fields = []
+        self.classAttributes = set()
+        self.instanceAttributes = set()
         self.cohesionCategoryMetrics = cohesionCategoryMetrics
         self.complexityCategoryMetrics = complexityCategoryMetrics
         self.couplingCategoryMetrics = couplingCategoryMetrics
@@ -20,7 +21,7 @@ class Class:
     def getPyFileObj(self):
         return self.pyFileObj
 
-    # Method that returns the ast node for the specific class. 
+    # Method that returns the ast node for the specific class.
     # We need it so that we don't have to repeatedly access the python files to get the class nodes.
     def getClassAstNode(self):
         return self.classAstNode
@@ -28,14 +29,20 @@ class Class:
     def get_methods(self):
         return self.methods
 
-    def get_fields(self):
-        return self.fields
+    def get_classAttributes(self):
+        return self.classAttributes
+
+    def get_instanceAttributes(self):
+        return self.instanceAttributes
 
     def add_method(self, method):
         self.methods.append(method)
 
-    def add_field(self, field):
-        self.fields.append(field)
+    def add_classAttribute(self, field):
+        self.classAttributes.add(field)
+
+    def add_instanceAttribute(self, field):
+        self.instanceAttributes.add(field)
 
     def getCohesionCategoryMetrics(self):
         return self.cohesionCategoryMetrics
