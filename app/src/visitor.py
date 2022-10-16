@@ -17,17 +17,33 @@ class Init_Visitor(ast.NodeVisitor):
         for child in node.body:
             # We want to start analyzing only for classes and no for non oop code
             if (isinstance(child, ast.ClassDef)):
-                print(child.name)
-                self.generic_visit(child)
+                self.visit_ClassDef(child)
 
     # Visit the node of a class
     def visit_ClassDef(self, node):
-        print(node)
+        print(node.name)
         self.generic_visit(node)
 
     # Visit the node of a method in a class
     def visit_FunctionDef(self, node):
         print(node.name)
+        self.generic_visit(node)
+
+    def visit_Assign(self, node):
+        self.generic_visit(node)
+
+    def visit_AnnAssign(self, node):
+        self.generic_visit(node)
+
+    # Visitor to get ONLY instance attributes!
+    def visit_Attribute(self, node):
+        if (node.value.id == "self"):
+            print(node.attr)
+
+    # Visitor to get ONLY class attributes!
+    def visit_Name(self, node):
+        if (isinstance(node.ctx, ast.Store)):
+            print(node.id)
 
 
 class visit_Class(ast.NodeVisitor):
