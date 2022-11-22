@@ -7,7 +7,7 @@ from visitor import *
 # C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting (path for Minas' testing)
 # C:/Users/John/Desktop/game-master-t (path for Panos' testing)
 # C:/Users/Money Maker/Documents/ProjectForTesting (path for Dionisis' testing)
-test_root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting"
+test_root_folder_path = "C:/Users/John/Desktop/game-master-t"
 
 test_project_name = "Game"
 project = Project(test_root_folder_path, test_project_name)
@@ -32,6 +32,7 @@ for python_file in project.get_files():
         for field in classObj.get_fields():
             print(f"  Field: {field}")
 
+
 # Testing - print Metrics
 print(f"Classes in Project: {MetricsCalculator.calcNOC(project.get_files())}")
 
@@ -40,6 +41,7 @@ for python_file in project.get_files():
         print(f"Class name: {classObj.getClassAstNode().name}")
         print(f"WMC1: {classObj.getSizeCategoryMetrics().getWMC1()}")
         print(f"NOM: {classObj.getSizeCategoryMetrics().getNOM()}")
+        print(f"MPC: {classObj.getCouplingCategoryMetrics().get_MPC()}")
         print(f"SIZE2: {classObj.getSizeCategoryMetrics().getSIZE2()}")
         print(f"WAC: {classObj.getSizeCategoryMetrics().getWAC()}")
         print(f"LCOM: {classObj.getCohesionCategoryMetrics().get_LCOM()}")
