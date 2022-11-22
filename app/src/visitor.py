@@ -110,19 +110,3 @@ class MethodsCalled_Visitor(ast.NodeVisitor):
                     for classObj in pythonFile.getFileClasses():
                         if (methodCalled and node.func.attr in classObj.get_methods()):
                             self.called.add(methodCalled)
-
-
-class Hierarchy_Visitor(ast.NodeVisitor):
-
-    def __init__(self, classObj):
-        self.classObj = classObj
-        self.children_classes = 0
-        self.children_classes_set = set()
-
-    def visit_ClassDef(self, node):
-        if (len(node.bases)):
-            for superClass in node.bases:
-                self.children_classes_set.add(superClass.id)
-            return len(node.bases)
-        else:
-            return 0
