@@ -2,6 +2,7 @@ from os import listdir
 from os.path import isfile, join
 from visitor import LCOM_Visitor
 from visitor import MethodsCalled_Visitor
+from visitor import Hierarchy_Visitor
 from classDecl import Class
 
 
@@ -17,6 +18,7 @@ class MetricsCalculator:
         self.calcLCOM()
         self.calcLOC()
         self.calcRFC()
+        self.calcNOCC()
 
     # Count the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
@@ -63,15 +65,23 @@ class MetricsCalculator:
         else:
             self.classObj.getCohesionCategoryMetrics().set_LCOM(non_cohesive - cohesive)
 
+    # Calculate RFC Metric
     def calcRFC(self):
         remoteMethodsSum = len(MethodsCalled_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()))
         self.classObj.getComplexityCategoryMetrics().setRFC(self.classObj.getSizeCategoryMetrics().getNOM() + remoteMethodsSum)
+
+    # Calculate NOCC Metric
+    def calcNOCC(self):
+        superClasses = 0
+        superClasses = Hierarchy_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())
+        self.classObj.getSizeCategoryMetrics().setNOCC(superClasses)
 
     # Calculate LOC Metric
     def calcLOC(self):
         self.classObj.getSizeCategoryMetrics().setLOC(self.countIn(self.classObj.getPyFileObj().getProject().get_root_folder_path()))
 
-##################### Methods necessary for LOC calculation #####################
+    ##################### Methods necessary for LOC calculation #####################
+
     def countLinesInPath(self, path, directory):
         count = 0
         for line in open(join(directory, path), encoding="utf8"):
