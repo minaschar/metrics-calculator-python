@@ -1,6 +1,7 @@
 from os import listdir
 from os.path import isfile, join
 from visitor import LCOM_Visitor
+from visitor import MethodsCalled_Visitor
 from classDecl import Class
 
 
@@ -15,6 +16,7 @@ class MetricsCalculator:
         self.calcWAC()
         self.calcLCOM()
         self.calcLOC()
+        self.calcRFC()
 
     # Count the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
@@ -36,8 +38,7 @@ class MetricsCalculator:
 
     # Count the number of methods and fields for each class in the project
     def calcSIZE2(self):
-        self.classObj.getSizeCategoryMetrics().setSIZE2(
-            len(self.classObj.get_methods()) + len(self.classObj.get_fields()))
+        self.classObj.getSizeCategoryMetrics().setSIZE2(len(self.classObj.get_methods()) + len(self.classObj.get_fields()))
 
     # Count the number of fields for each class
     def calcWAC(self):
@@ -61,6 +62,10 @@ class MetricsCalculator:
             self.classObj.getCohesionCategoryMetrics().set_LCOM(0)
         else:
             self.classObj.getCohesionCategoryMetrics().set_LCOM(non_cohesive - cohesive)
+
+    def calcRFC(self):
+        remoteMethodsSum = len(MethodsCalled_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()))
+        self.classObj.getComplexityCategoryMetrics().setRFC(self.classObj.getSizeCategoryMetrics().getNOM() + remoteMethodsSum)
 
     # Calculate LOC Metric
     def calcLOC(self):

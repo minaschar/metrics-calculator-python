@@ -42,12 +42,6 @@ class Init_Visitor(ast.NodeVisitor):
         self.currClass.add_method(node.name)
         self.generic_visit(node)
 
-    def visit_Assign(self, node):
-        self.generic_visit(node)
-
-    def visit_AnnAssign(self, node):
-        self.generic_visit(node)
-
     # Visitor to get instance attributes and class attributes that declared in method's body!
     def visit_Attribute(self, node):
         if (isinstance(node.ctx, ast.Store)):
@@ -95,3 +89,24 @@ class LCOM_Visitor(ast.NodeVisitor):
         # Class attributes that declared inside a method
         elif (node.value.id == self.classObj.get_name()):
             self.fields.add(self.classObj.get_name() + "." + node.attr)
+
+
+class MethodsCalled_Visitor(ast.NodeVisitor):
+
+    def __init__(self, classObj):
+        self.classObj = classObj
+        self.called = set()
+
+    def visit_ClassDef(self, node):
+        self.generic_visit(node)
+        return self.called
+
+    def visit_Call(self, node):
+
+        if (isinstance(node.func, ast.Attribute)):
+            if (node.func.value.id != "self"):
+                methodCalled = node.func.value.id + "." + node.func.attr
+                for pythonFile in self.classObj.getPyFileObj().getProject().get_files():
+                    for classObj in pythonFile.getFileClasses():
+                        if (methodCalled and node.func.attr in classObj.get_methods()):
+                            self.called.add(methodCalled)
