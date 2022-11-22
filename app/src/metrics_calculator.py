@@ -1,6 +1,7 @@
 from os import listdir
 from os.path import isfile, join
 from visitor import LCOM_Visitor
+from visitor import Hierarchy_Visitor
 from visitor import MethodsCalled_Visitor
 from classDecl import Class
 
@@ -17,6 +18,7 @@ class MetricsCalculator:
         self.calcLCOM()
         self.calcLOC()
         self.calcRFC()
+        self.calcNOCC()
 
     # Count the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
@@ -63,9 +65,23 @@ class MetricsCalculator:
         else:
             self.classObj.getCohesionCategoryMetrics().set_LCOM(non_cohesive - cohesive)
 
+    # Calculate RFC Metric
     def calcRFC(self):
         remoteMethodsSum = len(MethodsCalled_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()))
         self.classObj.getComplexityCategoryMetrics().setRFC(self.classObj.getSizeCategoryMetrics().getNOM() + remoteMethodsSum)
+
+    # Calculate NOCC Metric
+    def calcNOCC(self):
+        allParentClasses = []
+        myClassChildrenClasses = 0
+        for pythonFile in self.classObj.getPyFileObj().getProject().get_files():
+            for classObj in pythonFile.getFileClasses():
+                allParentClasses = allParentClasses + Hierarchy_Visitor(classObj).visit_ClassDef(classObj.getClassAstNode())
+        for myClass in allParentClasses:
+            if (myClass == self.classObj.name):
+                myClassChildrenClasses = myClassChildrenClasses + 1
+
+        self.classObj.getSizeCategoryMetrics().setNOCC(myClassChildrenClasses)
 
     # Calculate LOC Metric
     def calcLOC(self):
