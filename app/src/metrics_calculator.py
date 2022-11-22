@@ -9,7 +9,7 @@ class MetricsCalculator:
 
     def __init__(self, classObj: Class):
         self.classObj = classObj
-        self.calcWMC1()
+        self.calcWMPC2()
         self.calcNOM()
         self.calcSIZE2()
         self.calcWAC()
@@ -31,8 +31,8 @@ class MetricsCalculator:
         self.classObj.getSizeCategoryMetrics().setNOM(len(self.classObj.get_methods()))
 
     # Count the number of methods for each class in the project
-    def calcWMC1(self):
-        self.classObj.getSizeCategoryMetrics().setWMC1(len(self.classObj.get_methods()))
+    def calcWMPC2(self):
+        self.classObj.getComplexityCategoryMetrics().setWMPC2(len(self.classObj.get_methods()))
 
     # Count the number of methods and fields for each class in the project
     def calcSIZE2(self):

@@ -3,7 +3,8 @@ class ComplexityCategory:
 
     DIT = 0
     RFC = 0
-    WMC2 = 0.0
+    WMPC1 = 0.0
+    WMPC2 = 0
     NAC = 0
     CMC = 0
     CTA = 0
@@ -21,8 +22,11 @@ class ComplexityCategory:
     def getRFC(self):
         return self.RFC
 
-    def getWMC2(self):
-        return self.WMC2
+    def getWMPC1(self):
+        return self.WMPC1
+
+    def getWMPC2(self):
+        return self.WMPC2
 
     def getNAC(self):
         return self.NAC
@@ -58,8 +62,11 @@ class ComplexityCategory:
     def setRFC(self, value):
         self.RFC = value
 
-    def setWMC2(self, value):
-        self.WMC2 = value
+    def setWMPC1(self, value):
+        self.WMPC1 = value
+
+    def setWMPC2(self, value):
+        self.WMPC2 = value
 
     def setNAC(self, value):
         self.NAC = value
