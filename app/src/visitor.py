@@ -119,3 +119,29 @@ class MPC_Visitor(ast.NodeVisitor):
 
         if(isinstance(node.func, ast.Attribute) and node.func.value.id != "self"):
             self.messages = self.messages + 1
+
+
+class CBO_Visitor(ast.NodeVisitor):
+
+    def __init__(self, classObj):
+        self.classObj = classObj
+        self.elements = set()
+
+    def visit_ClassDef(self, node):
+        for child in node.body:
+            if(isinstance(child, ast.FunctionDef)):
+                self.visit_FunctionDef(child)
+
+        return self.elements
+
+    def visit_FunctionDef(self, node):
+
+        for child in node.body:
+            self.generic_visit(child)
+
+    def visit_Call(self, node):
+        print("iusfed")
+
+    def visit_Attribute(self, node):
+        if(node.value.id != "self"):
+            self.elements.add(node.value.id)

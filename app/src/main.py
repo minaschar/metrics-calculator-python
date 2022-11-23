@@ -45,4 +45,5 @@ for python_file in project.get_files():
         print(f"SIZE2: {classObj.getSizeCategoryMetrics().getSIZE2()}")
         print(f"WAC: {classObj.getSizeCategoryMetrics().getWAC()}")
         print(f"LCOM: {classObj.getCohesionCategoryMetrics().get_LCOM()}")
+        print(f"CBO: {classObj.getCouplingCategoryMetrics().get_CBO()}")
         print(f"LOC: {classObj.getSizeCategoryMetrics().getLOC()}")
