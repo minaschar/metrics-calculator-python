@@ -3,6 +3,8 @@ from os.path import isfile, join
 from visitor import LCOM_Visitor
 from visitor import Hierarchy_Visitor
 from visitor import MethodsCalled_Visitor
+from visitor import MPC_Visitor
+from visitor import CBO_Visitor
 from classDecl import Class
 
 
@@ -15,6 +17,8 @@ class MetricsCalculator:
         self.calcNOM()
         self.calcSIZE2()
         self.calcWAC()
+        self.calcMPC()
+        self.calcCBO()
         self.calcLCOM()
         self.calcLOC()
         self.calcRFC()
@@ -87,7 +91,19 @@ class MetricsCalculator:
     def calcLOC(self):
         self.classObj.getSizeCategoryMetrics().setLOC(self.countIn(self.classObj.getPyFileObj().getProject().get_root_folder_path()))
 
+    def calcMPC(self):
+        messages = MPC_Visitor(self.classObj).visit(self.classObj.getClassAstNode())
+
+        self.classObj.getCouplingCategoryMetrics().set_MPC(messages)
+
+    def calcCBO(self):
+        elements = CBO_Visitor(self.classObj).visit(self.classObj.getClassAstNode())
+        self.classObj.getCouplingCategoryMetrics().set_CBO(len(elements))
+
+
 ##################### Methods necessary for LOC calculation #####################
+
+
     def countLinesInPath(self, path, directory):
         count = 0
         for line in open(join(directory, path), encoding="utf8"):

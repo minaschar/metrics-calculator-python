@@ -1,5 +1,5 @@
 import ast
-from sys import orig_argv
+# from sys import orig_argv
 from cohesion_category import CohesionCategory
 from coupling_category import CouplingCategory
 from qmood_category import QMOODCategory
@@ -91,6 +91,7 @@ class LCOM_Visitor(ast.NodeVisitor):
             self.fields.add(self.classObj.get_name() + "." + node.attr)
 
 
+
 class MethodsCalled_Visitor(ast.NodeVisitor):
 
     def __init__(self, classObj):
@@ -126,3 +127,53 @@ class Hierarchy_Visitor(ast.NodeVisitor):
             return self.parent_classes_list
         else:
             return []
+
+class MPC_Visitor(ast.NodeVisitor):
+
+    def __init__(self, classObj):
+        self.classObj = classObj
+        self.messages = 0
+
+    def visit_ClassDef(self, node):
+        for child in node.body:
+            if (isinstance(child, ast.FunctionDef)):
+                self.visit_FunctionDef(child)
+
+        return self.messages
+
+    def visit_FunctionDef(self, node):
+
+        for child in node.body:
+            self.generic_visit(child)
+
+    def visit_Call(self, node):
+
+        if(isinstance(node.func, ast.Attribute) and node.func.value.id != "self"):
+            self.messages = self.messages + 1
+
+
+class CBO_Visitor(ast.NodeVisitor):
+
+    def __init__(self, classObj):
+        self.classObj = classObj
+        self.elements = set()
+
+    def visit_ClassDef(self, node):
+        for child in node.body:
+            if(isinstance(child, ast.FunctionDef)):
+                self.visit_FunctionDef(child)
+
+        return self.elements
+
+    def visit_FunctionDef(self, node):
+
+        for child in node.body:
+            self.generic_visit(child)
+
+    def visit_Call(self, node):
+        print("iusfed")
+
+    def visit_Attribute(self, node):
+        if(node.value.id != "self"):
+            self.elements.add(node.value.id)
+
