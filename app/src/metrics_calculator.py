@@ -98,7 +98,16 @@ class MetricsCalculator:
 
     def calcCBO(self):
         elements = CBO_Visitor(self.classObj).visit(self.classObj.getClassAstNode())
-        self.classObj.getCouplingCategoryMetrics().set_CBO(len(elements))
+        elementsNoLibrary = set()
+        keys = [k for k, v in elements.items()]
+        for phythonFile in self.classObj.getPyFileObj().getProject().get_files():
+            for classofFile in phythonFile.getFileClasses():
+                if(classofFile.get_name() in keys):
+                    for c, method in elements.items():
+                        if(method in classofFile.get_methods()):
+                            elementsNoLibrary.add(c)
+
+        self.classObj.getCouplingCategoryMetrics().set_CBO(len(elementsNoLibrary))
 
 
 ##################### Methods necessary for LOC calculation #####################

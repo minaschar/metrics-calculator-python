@@ -91,7 +91,6 @@ class LCOM_Visitor(ast.NodeVisitor):
             self.fields.add(self.classObj.get_name() + "." + node.attr)
 
 
-
 class MethodsCalled_Visitor(ast.NodeVisitor):
 
     def __init__(self, classObj):
@@ -128,6 +127,7 @@ class Hierarchy_Visitor(ast.NodeVisitor):
         else:
             return []
 
+
 class MPC_Visitor(ast.NodeVisitor):
 
     def __init__(self, classObj):
@@ -156,7 +156,7 @@ class CBO_Visitor(ast.NodeVisitor):
 
     def __init__(self, classObj):
         self.classObj = classObj
-        self.elements = set()
+        self.elements = {}
 
     def visit_ClassDef(self, node):
         for child in node.body:
@@ -175,5 +175,4 @@ class CBO_Visitor(ast.NodeVisitor):
 
     def visit_Attribute(self, node):
         if(node.value.id != "self"):
-            self.elements.add(node.value.id)
-
+            self.elements[node.value.id] = node.attr
