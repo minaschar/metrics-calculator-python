@@ -8,7 +8,7 @@ from visitor import *
 # C:/Users/John/Desktop/game-master-t (path for Panos' testing)
 # C:/Users/Money Maker/Documents/ProjectForTesting (path for Dionisis' testing)
 
-test_root_folder_path = "C:/Users/John/Desktop/game-master-t"
+test_root_folder_path = "C:/Users/Money Maker/Documents/ProjectForTesting"
 
 test_project_name = "Game"
 project = Project(test_root_folder_path, test_project_name)
@@ -50,3 +50,4 @@ for python_file in project.get_files():
         print(f"CBO: {classObj.getCouplingCategoryMetrics().get_CBO()}")
         print(f"LOC: {classObj.getSizeCategoryMetrics().getLOC()}")
         print(f"NOCC: {classObj.getSizeCategoryMetrics().getNOCC()}")
+        print(f"DIT: {classObj.getComplexityCategoryMetrics().getDIT()}")

@@ -8,6 +8,7 @@ class Class:
         self.classAstNode = classAstNode
         self.methods = []
         self.fields = set()  # All class attributes and instance attributes
+        self.hierarchy = -1
         self.cohesionCategoryMetrics = cohesionCategoryMetrics
         self.complexityCategoryMetrics = complexityCategoryMetrics
         self.couplingCategoryMetrics = couplingCategoryMetrics
@@ -16,6 +17,9 @@ class Class:
 
     def get_name(self):
         return self.name
+
+    def get_hierarchy(self):
+        return self.hierarchy
 
     def getPyFileObj(self):
         return self.pyFileObj
@@ -51,3 +55,7 @@ class Class:
 
     def getSizeCategoryMetrics(self):
         return self.sizeCategoryMetrics
+
+    # Setter for hierarchy property needed for DIT Metric
+    def set_hierarchy(self, value):
+        self.hierarchy = value
