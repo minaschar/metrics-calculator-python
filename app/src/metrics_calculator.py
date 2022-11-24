@@ -23,6 +23,7 @@ class MetricsCalculator:
         self.calcLOC()
         self.calcRFC()
         self.calcNOCC()
+        self.calcDIT()
 
     # Count the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
@@ -76,33 +77,78 @@ class MetricsCalculator:
 
     # Calculate NOCC Metric
     def calcNOCC(self):
-        allParentClasses = []
-        myClassChildrenClasses = 0
-        for pythonFile in self.classObj.getPyFileObj().getProject().get_files():
-            for classObj in pythonFile.getFileClasses():
-                allParentClasses = allParentClasses + Hierarchy_Visitor(classObj).visit_ClassDef(classObj.getClassAstNode())
-        for myClass in allParentClasses:
-            if (myClass == self.classObj.name):
-                myClassChildrenClasses = myClassChildrenClasses + 1
 
+        myClassChildrenClasses = len(self.returnChildren(self.classObj))
         self.classObj.getSizeCategoryMetrics().setNOCC(myClassChildrenClasses)
+
+    # Calculate DIT Metric
+    def calcDIT(self):
+        # Class is not in any hierarchy
+        if ((Hierarchy_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()) == []) and (len(self.returnChildren(self.classObj)) == 0)):
+            self.classObj.getComplexityCategoryMetrics().setDIT(0)
+            self.classObj.set_hierarchy(0)
+        elif ((Hierarchy_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()) == []) and (len(self.returnChildren(self.classObj)) != 0)):
+            self.classObj.getComplexityCategoryMetrics().setDIT(1)
+            self.classObj.set_hierarchy(1)
+        else:
+            myParentClassesNamesOnly = Hierarchy_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())
+
+            # Converting simple name pointers to actually object classes
+            myParentClassesObjects = self.convertToActualParentObjects(self.classObj, myParentClassesNamesOnly)
+            maxParentDepth = self.returnMaxParentDepth(self.classObj, myParentClassesObjects)
+            self.classObj.getComplexityCategoryMetrics().setDIT(maxParentDepth + 1)
+            self.classObj.set_hierarchy(maxParentDepth + 1)
 
     # Calculate LOC Metric
     def calcLOC(self):
         self.classObj.getSizeCategoryMetrics().setLOC(self.countIn(self.classObj.getPyFileObj().getProject().get_root_folder_path()))
 
+    # Calculate MPC Metric
     def calcMPC(self):
         messages = MPC_Visitor(self.classObj).visit(self.classObj.getClassAstNode())
 
         self.classObj.getCouplingCategoryMetrics().set_MPC(messages)
 
+    # Calculate CBO Metric
     def calcCBO(self):
         elements = CBO_Visitor(self.classObj).visit(self.classObj.getClassAstNode())
         self.classObj.getCouplingCategoryMetrics().set_CBO(len(elements))
 
 
-##################### Methods necessary for LOC calculation #####################
+##################### Methods necessary for NOCC and DIT calculation #####################
 
+    def returnChildren(self, classInQuestion):
+        allParentClasses = []
+        myClassChildrenClasses = 0
+        myClassChildrenClassesList = []
+        for pythonFile in classInQuestion.getPyFileObj().getProject().get_files():
+            for classObj in pythonFile.getFileClasses():
+                allParentClasses = allParentClasses + Hierarchy_Visitor(classObj).visit_ClassDef(classObj.getClassAstNode())
+        for myClass in allParentClasses:
+            if (myClass == classInQuestion.name):
+                myClassChildrenClasses = myClassChildrenClasses + 1
+                myClassChildrenClassesList.append(myClass)
+        return myClassChildrenClassesList
+
+    def convertToActualParentObjects(self, classInQuestion, myParentClassesNamesOnly):
+        myParentClassesObjects = []
+        for pythonFile in classInQuestion.getPyFileObj().getProject().get_files():
+            for classObj in pythonFile.getFileClasses():
+                for classNameOnly in myParentClassesNamesOnly:
+                    if (classObj.name == classNameOnly):
+                        myParentClassesObjects.append(classObj)
+        return myParentClassesObjects
+
+    def returnMaxParentDepth(self, classInQuestion, myParentClassesObjects):
+        maxParentDIT = -2
+        for aParentClassObject in myParentClassesObjects:
+            if (aParentClassObject.get_hierarchy() == -1):
+                self.calcDIT(aParentClassObject)
+            else:
+                if (aParentClassObject.get_hierarchy() > maxParentDIT):
+                    maxParentDIT = aParentClassObject.get_hierarchy()
+        return maxParentDIT
+        ##################### Methods necessary for LOC calculation #####################
 
     def countLinesInPath(self, path, directory):
         count = 0
