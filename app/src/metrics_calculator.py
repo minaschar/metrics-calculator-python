@@ -1,10 +1,6 @@
 from os import listdir
 from os.path import isfile, join
-from visitor import LCOM_Visitor
-from visitor import Hierarchy_Visitor
-from visitor import MethodsCalled_Visitor
-from visitor import MPC_Visitor
-from visitor import CBO_Visitor
+from visitor import *
 from classDecl import Class
 
 
@@ -24,6 +20,7 @@ class MetricsCalculator:
         self.calcRFC()
         self.calcNOCC()
         self.calcDIT()
+        self.calcWMPC1()
 
     # Count the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
@@ -122,6 +119,11 @@ class MetricsCalculator:
                             elementsNoLibrary.add(c)
 
         self.classObj.getCouplingCategoryMetrics().set_CBO(len(elementsNoLibrary))
+
+    def calcWMPC1(self):
+        class_cc = CC_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())
+        class_nom = len(self.classObj.get_methods())
+        self.classObj.getComplexityCategoryMetrics().setWMPC1(round(class_cc / class_nom, 2))
 
 
 ##################### Methods necessary for NOCC and DIT calculation #####################
