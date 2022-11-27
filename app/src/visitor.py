@@ -39,7 +39,9 @@ class Init_Visitor(ast.NodeVisitor):
 
     # Visit the node of a method in a class
     def visit_FunctionDef(self, node):
-        self.currClass.add_method(node.name)
+        # Get method arguments
+        arguments = [arg.arg for arg in node.args.args]
+        self.currClass.add_method(node.name, arguments)
         self.generic_visit(node)
 
     # Visitor to get instance attributes and class attributes that declared in method's body!
@@ -108,7 +110,7 @@ class MethodsCalled_Visitor(ast.NodeVisitor):
                 methodCalled = node.func.value.id + "." + node.func.attr
                 for pythonFile in self.classObj.getPyFileObj().getProject().get_files():
                     for classObj in pythonFile.getFileClasses():
-                        if (methodCalled and node.func.attr in classObj.get_methods()):
+                        if (methodCalled and node.func.attr in classObj.get_methods().keys()):
                             self.called.add(methodCalled)
 
 
