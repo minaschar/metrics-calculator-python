@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>575</width>
+    <width>573</width>
     <height>384</height>
    </rect>
   </property>
@@ -17,10 +17,10 @@
    <string notr="true">background-color:#224562;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="calculateBtn">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>140</x>
       <y>280</y>
       <width>261</width>
       <height>51</height>
@@ -42,10 +42,10 @@ background-color: #B68F05;</string>
      <string>START CALCULATING ⮞</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="toolButton">
+   <widget class="QToolButton" name="openFolderButton">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>290</x>
       <y>200</y>
       <width>141</width>
       <height>41</height>
@@ -67,12 +67,12 @@ background-color: #B68F05;</string>
      <string>Open Folder</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="nameLbl">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>30</y>
-      <width>491</width>
+      <x>-10</x>
+      <y>20</y>
+      <width>571</width>
       <height>51</height>
      </rect>
     </property>
@@ -91,12 +91,12 @@ margin: 0 auto;</string>
      <string>Metrics Calculator</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="pythonProjectLbl">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>70</x>
       <y>100</y>
-      <width>281</width>
+      <width>331</width>
       <height>51</height>
      </rect>
     </property>
@@ -114,11 +114,11 @@ margin: 0 auto;</string>
      <string>For Python Projects</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_3">
+   <widget class="QLabel" name="logoLbl">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>80</y>
+      <x>400</x>
+      <y>90</y>
       <width>101</width>
       <height>91</height>
      </rect>
@@ -127,18 +127,18 @@ margin: 0 auto;</string>
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>../../Downloads/Python_metrics_calculator_logo-removebg-preview.png</pixmap>
+     <pixmap>../resources/images/logos/Python_metrics_calculator_logo_(3).png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="label_4">
+   <widget class="QLabel" name="selectProjectLbl">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>110</x>
       <y>190</y>
-      <width>141</width>
+      <width>171</width>
       <height>51</height>
      </rect>
     </property>
@@ -156,10 +156,10 @@ margin: 0 auto;</string>
      <string>Select your project:</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="toolButton_2">
+   <widget class="QToolButton" name="helpBtn">
     <property name="geometry">
      <rect>
-      <x>530</x>
+      <x>520</x>
       <y>330</y>
       <width>31</width>
       <height>31</height>
@@ -181,12 +181,12 @@ background-color: #B68F05;</string>
      <string>?</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_5">
+   <widget class="QLabel" name="selectedProjectLbl">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>330</x>
       <y>240</y>
-      <width>81</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
