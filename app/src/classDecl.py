@@ -6,7 +6,7 @@ class Class:
         self.name = className
         self.pyFileObj = pyFileObj
         self.classAstNode = classAstNode
-        self.methods = []
+        self.methods = dict()
         self.fields = set()  # All class attributes and instance attributes
         self.hierarchy = -1
         self.cohesionCategoryMetrics = cohesionCategoryMetrics
@@ -35,8 +35,8 @@ class Class:
     def get_fields(self):
         return self.fields
 
-    def add_method(self, method):
-        self.methods.append(method)
+    def add_method(self, methodName, params):
+        self.methods[methodName] = params
 
     def add_field(self, field):
         self.fields.add(field)

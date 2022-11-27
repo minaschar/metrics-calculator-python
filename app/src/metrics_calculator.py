@@ -38,7 +38,16 @@ class MetricsCalculator:
 
     # Count the number of methods for each class in the project
     def calcWMPC2(self):
-        self.classObj.getComplexityCategoryMetrics().setWMPC2(len(self.classObj.get_methods()))
+        nop = 0
+
+        # In args_size we have the count of parameters for each function in a class
+        args_size = [len(args) for args in self.classObj.get_methods().values()]
+
+        # We count all parameters in the class
+        for size in args_size:
+            nop += size
+
+        self.classObj.getComplexityCategoryMetrics().setWMPC2(len(self.classObj.get_methods()) + nop)
 
     # Count the number of methods and fields for each class in the project
     def calcSIZE2(self):
@@ -115,7 +124,7 @@ class MetricsCalculator:
             for classofFile in phythonFile.getFileClasses():
                 if(classofFile.get_name() in keys):
                     for c, method in elements.items():
-                        if(method in classofFile.get_methods()):
+                        if(method in classofFile.get_methods().keys()):
                             elementsNoLibrary.add(c)
 
         self.classObj.getCouplingCategoryMetrics().set_CBO(len(elementsNoLibrary))
@@ -127,7 +136,6 @@ class MetricsCalculator:
 
 
 ##################### Methods necessary for NOCC and DIT calculation #####################
-
 
     def returnChildren(self, classInQuestion):
         allParentClasses = []
