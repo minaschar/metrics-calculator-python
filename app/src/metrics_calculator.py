@@ -98,7 +98,7 @@ class MetricsCalculator:
 
     # Calculate LOC Metric
     def calcLOC(self):
-        self.classObj.getSizeCategoryMetrics().setLOC(self.countIn(self.classObj.getPyFileObj().getProject().get_root_folder_path()))
+        self.classObj.getSizeCategoryMetrics().setLOC(LOC_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()))
 
     # Calculate MPC Metric
     def calcMPC(self):
@@ -127,6 +127,7 @@ class MetricsCalculator:
 
 
 ##################### Methods necessary for NOCC and DIT calculation #####################
+
 
     def returnChildren(self, classInQuestion):
         allParentClasses = []
@@ -159,22 +160,3 @@ class MetricsCalculator:
                 if (aParentClassObject.get_hierarchy() > maxParentDIT):
                     maxParentDIT = aParentClassObject.get_hierarchy()
         return maxParentDIT
-        ##################### Methods necessary for LOC calculation #####################
-
-    def countLinesInPath(self, path, directory):
-        count = 0
-        for line in open(join(directory, path), encoding="utf8"):
-            count += 1
-        return count
-
-    def countLines(self, paths, directory):
-        count = 0
-        for path in paths:
-            count = count + self.countLinesInPath(path, directory)
-        return count
-
-    def getPaths(self, directory):
-        return [f for f in listdir(directory) if isfile(join(directory, f))]
-
-    def countIn(self, directory):
-        return self.countLines(self.getPaths(directory), directory)
