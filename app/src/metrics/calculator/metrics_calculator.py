@@ -1,7 +1,7 @@
 from os import listdir
 from os.path import isfile, join
-from visitor import *
-from classDecl import Class
+from visitors.visitor import *
+from entities.classDecl import Class
 
 
 # In this class exists methods that calculates metrics for the whole project

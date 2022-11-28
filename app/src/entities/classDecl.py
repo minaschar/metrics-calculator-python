@@ -1,5 +1,4 @@
 
-
 class Class:
 
     def __init__(self, className, pyFileObj, classAstNode, cohesionCategoryMetrics, complexityCategoryMetrics, couplingCategoryMetrics, qmoodCategoryMetrics, sizeCategoryMetrics):

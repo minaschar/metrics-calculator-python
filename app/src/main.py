@@ -1,7 +1,7 @@
-from metrics_calculator import MetricsCalculator
-from project import Project
-from generate_ast import ASTGenerator
-from visitor import *
+from metrics.calculator.metrics_calculator import MetricsCalculator
+from entities.project import Project
+from generator.generate_ast import ASTGenerator
+from visitors.visitor import *
 
 # project path to test the code
 # C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting (path for Minas' testing)

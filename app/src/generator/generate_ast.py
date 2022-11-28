@@ -1,9 +1,7 @@
 import ast
-from asyncore import read
 import os
-from pprint import pprint
-from project import Project
-from python_file import Python_File
+from entities.project import Project
+from entities.python_file import Python_File
 
 
 class ASTGenerator:
