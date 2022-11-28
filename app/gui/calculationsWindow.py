@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_metricsWindow(object):
     def setupUi(self, metricsWindow):
         metricsWindow.setObjectName("metricsWindow")
-        metricsWindow.resize(846, 725)
+        metricsWindow.setFixedSize(846, 725)
         metricsWindow.setStyleSheet("background-color:#224562;")
         self.projectNameLbl_2 = QtWidgets.QLabel(metricsWindow)
         self.projectNameLbl_2.setGeometry(QtCore.QRect(40, 30, 331, 31))

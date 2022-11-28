@@ -2,13 +2,23 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>573</width>
-    <height>384</height>
+    <width>569</width>
+    <height>386</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>14</pointsize>
+    <weight>75</weight>
+    <bold>true</bold>
+   </font>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -20,9 +30,9 @@
    <widget class="QPushButton" name="calculateBtn">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>280</y>
-      <width>261</width>
+      <x>120</x>
+      <y>290</y>
+      <width>341</width>
       <height>51</height>
      </rect>
     </property>
@@ -45,8 +55,8 @@ background-color: #B68F05;</string>
    <widget class="QToolButton" name="openFolderButton">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>200</y>
+      <x>320</x>
+      <y>190</y>
       <width>141</width>
       <height>41</height>
      </rect>
@@ -70,22 +80,22 @@ background-color: #B68F05;</string>
    <widget class="QLabel" name="nameLbl">
     <property name="geometry">
      <rect>
-      <x>-10</x>
-      <y>20</y>
-      <width>571</width>
+      <x>60</x>
+      <y>30</y>
+      <width>471</width>
       <height>51</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>32</pointsize>
+      <pointsize>29</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">color: #FFD43B;
-margin: 0 auto;</string>
+</string>
     </property>
     <property name="text">
      <string>Metrics Calculator</string>
@@ -94,15 +104,15 @@ margin: 0 auto;</string>
    <widget class="QLabel" name="pythonProjectLbl">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>100</y>
-      <width>331</width>
+      <x>60</x>
+      <y>90</y>
+      <width>261</width>
       <height>51</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>20</pointsize>
+      <pointsize>14</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
@@ -114,30 +124,11 @@ margin: 0 auto;</string>
      <string>For Python Projects</string>
     </property>
    </widget>
-   <widget class="QLabel" name="logoLbl">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>90</y>
-      <width>101</width>
-      <height>91</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>../resources/images/logos/Python_metrics_calculator_logo_(3).png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLabel" name="selectProjectLbl">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>190</y>
+      <x>120</x>
+      <y>180</y>
       <width>171</width>
       <height>51</height>
      </rect>
@@ -159,7 +150,7 @@ margin: 0 auto;</string>
    <widget class="QToolButton" name="helpBtn">
     <property name="geometry">
      <rect>
-      <x>520</x>
+      <x>510</x>
       <y>330</y>
       <width>31</width>
       <height>31</height>
@@ -184,9 +175,9 @@ background-color: #B68F05;</string>
    <widget class="QLabel" name="selectedProjectLbl">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>320</x>
       <y>240</y>
-      <width>101</width>
+      <width>221</width>
       <height>21</height>
      </rect>
     </property>
@@ -202,6 +193,25 @@ background-color: #B68F05;</string>
     </property>
     <property name="text">
      <string>selected _project</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>90</y>
+      <width>181</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../resources/images/logos/Python_metrics_logo.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>

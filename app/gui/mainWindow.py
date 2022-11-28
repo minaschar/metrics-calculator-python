@@ -9,18 +9,26 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+# import metrics ui
 from calculationsWindow import Ui_metricsWindow
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(573, 384)
+        MainWindow.setEnabled(True)
+        # set the size of window as fixed
+        MainWindow.setFixedSize(569, 386)
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        MainWindow.setFont(font)
         MainWindow.setStyleSheet("background-color:#224562;")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.calculateBtn = QtWidgets.QPushButton(self.centralwidget)
-        self.calculateBtn.setGeometry(QtCore.QRect(140, 280, 261, 51))
+        self.calculateBtn.setGeometry(QtCore.QRect(120, 290, 341, 51))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
@@ -31,7 +39,7 @@ class Ui_MainWindow(object):
                                         "background-color: #B68F05;")
         self.calculateBtn.setObjectName("calculateBtn")
         self.openFolderButton = QtWidgets.QToolButton(self.centralwidget)
-        self.openFolderButton.setGeometry(QtCore.QRect(290, 200, 141, 41))
+        self.openFolderButton.setGeometry(QtCore.QRect(320, 190, 141, 41))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -42,32 +50,26 @@ class Ui_MainWindow(object):
                                             "background-color: #B68F05;")
         self.openFolderButton.setObjectName("openFolderButton")
         self.nameLbl = QtWidgets.QLabel(self.centralwidget)
-        self.nameLbl.setGeometry(QtCore.QRect(-10, 20, 571, 51))
+        self.nameLbl.setGeometry(QtCore.QRect(60, 30, 471, 51))
         font = QtGui.QFont()
-        font.setPointSize(32)
+        font.setPointSize(29)
         font.setBold(True)
         font.setWeight(75)
         self.nameLbl.setFont(font)
         self.nameLbl.setStyleSheet("color: #FFD43B;\n"
-                                   "margin: 0 auto;")
+                                   "")
         self.nameLbl.setObjectName("nameLbl")
         self.pythonProjectLbl = QtWidgets.QLabel(self.centralwidget)
-        self.pythonProjectLbl.setGeometry(QtCore.QRect(70, 100, 331, 51))
+        self.pythonProjectLbl.setGeometry(QtCore.QRect(60, 90, 261, 51))
         font = QtGui.QFont()
-        font.setPointSize(20)
+        font.setPointSize(14)
         font.setBold(True)
         font.setWeight(75)
         self.pythonProjectLbl.setFont(font)
         self.pythonProjectLbl.setStyleSheet("color: #FFD43B;")
         self.pythonProjectLbl.setObjectName("pythonProjectLbl")
-        self.logoLbl = QtWidgets.QLabel(self.centralwidget)
-        self.logoLbl.setGeometry(QtCore.QRect(400, 90, 101, 91))
-        self.logoLbl.setText("")
-        self.logoLbl.setPixmap(QtGui.QPixmap("gui\\../resources/images/logos/Python_metrics_calculator_logo_(3).png"))
-        self.logoLbl.setScaledContents(True)
-        self.logoLbl.setObjectName("logoLbl")
         self.selectProjectLbl = QtWidgets.QLabel(self.centralwidget)
-        self.selectProjectLbl.setGeometry(QtCore.QRect(110, 190, 171, 51))
+        self.selectProjectLbl.setGeometry(QtCore.QRect(120, 180, 171, 51))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -76,7 +78,7 @@ class Ui_MainWindow(object):
         self.selectProjectLbl.setStyleSheet("color:#C69C07;")
         self.selectProjectLbl.setObjectName("selectProjectLbl")
         self.helpBtn = QtWidgets.QToolButton(self.centralwidget)
-        self.helpBtn.setGeometry(QtCore.QRect(520, 330, 31, 31))
+        self.helpBtn.setGeometry(QtCore.QRect(510, 330, 31, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -87,7 +89,7 @@ class Ui_MainWindow(object):
                                    "background-color: #B68F05;")
         self.helpBtn.setObjectName("helpBtn")
         self.selectedProjectLbl = QtWidgets.QLabel(self.centralwidget)
-        self.selectedProjectLbl.setGeometry(QtCore.QRect(330, 240, 101, 21))
+        self.selectedProjectLbl.setGeometry(QtCore.QRect(320, 240, 221, 21))
         font = QtGui.QFont()
         font.setPointSize(7)
         font.setBold(False)
@@ -95,11 +97,18 @@ class Ui_MainWindow(object):
         self.selectedProjectLbl.setFont(font)
         self.selectedProjectLbl.setStyleSheet("color:#C69C07;")
         self.selectedProjectLbl.setObjectName("selectedProjectLbl")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(310, 90, 181, 71))
+        self.label.setText("")
+        self.label.setPixmap(QtGui.QPixmap("gui\\../resources/images/logos/Python_metrics_logo.png"))
+        self.label.setScaledContents(True)
+        self.label.setObjectName("label")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
+       # set click listeners
         self.openFolderButton.clicked.connect(self.openFiles)
         self.calculateBtn.clicked.connect(self.calcMetrics)
 
@@ -108,7 +117,10 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        # set title
+        MainWindow.setWindowTitle(_translate("MainWindow", "Python Metrics Calculator"))
+        # set favicon
+        MainWindow.setWindowIcon(QtGui.QIcon("gui\\../resources/images/favicons/favicon.png"))
         self.calculateBtn.setText(_translate("MainWindow", "START CALCULATING ⮞"))
         self.openFolderButton.setText(_translate("MainWindow", "Open Folder"))
         self.nameLbl.setText(_translate("MainWindow", "Metrics Calculator"))
@@ -117,12 +129,14 @@ class Ui_MainWindow(object):
         self.helpBtn.setText(_translate("MainWindow", "?"))
         self.selectedProjectLbl.setText(_translate("MainWindow", "selected _project"))
 
+    # method that opens file dialog
     def openFiles(self):
         fileName = QtWidgets.QFileDialog.getExistingDirectory()
 
         if(fileName):
             self.selectedProjectLbl.setText(fileName)
 
+    # method that calculates metrics
     def calcMetrics(self):
         self.window = QtWidgets.QDialog()
         self.ui = Ui_metricsWindow()
