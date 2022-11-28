@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>metricsWindow</class>
+ <widget class="QDialog" name="metricsWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -16,7 +16,7 @@
   <property name="styleSheet">
    <string notr="true">background-color:#224562;</string>
   </property>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="projectNameLbl_2">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -39,7 +39,7 @@
     <string>Metrics for {{Project_name}}</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="nocLbl">
    <property name="geometry">
     <rect>
      <x>600</x>
@@ -62,7 +62,7 @@
     <string>Classes Found (NOC Metric) = {{Number}}</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="exportExcelBtn">
    <property name="geometry">
     <rect>
      <x>430</x>
@@ -87,7 +87,7 @@ background-color: #00A300;</string>
     <string>Export Results to Excel File</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_3">
+  <widget class="QPushButton" name="helpBtn">
    <property name="geometry">
     <rect>
      <x>800</x>
@@ -112,7 +112,7 @@ background-color: #B68F05;</string>
     <string>?</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_4">
+  <widget class="QPushButton" name="backMainBtn">
    <property name="geometry">
     <rect>
      <x>140</x>
@@ -137,7 +137,7 @@ background-color: #B68F05;;</string>
     <string>Back to main screen</string>
    </property>
   </widget>
-  <widget class="QTableWidget" name="tableWidget">
+  <widget class="QTableWidget" name="metricsTbl">
    <property name="geometry">
     <rect>
      <x>30</x>

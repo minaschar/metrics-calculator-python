@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from calculationsWindow import Ui_metricsWindow
 
 
 class Ui_MainWindow(object):
@@ -99,7 +100,8 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
-        self.openFolderButton.clicked.connect(self.click)
+        self.openFolderButton.clicked.connect(self.openFiles)
+        self.calculateBtn.clicked.connect(self.calcMetrics)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -115,11 +117,18 @@ class Ui_MainWindow(object):
         self.helpBtn.setText(_translate("MainWindow", "?"))
         self.selectedProjectLbl.setText(_translate("MainWindow", "selected _project"))
 
-    def click(self):
+    def openFiles(self):
         fileName = QtWidgets.QFileDialog.getExistingDirectory()
 
         if(fileName):
             self.selectedProjectLbl.setText(fileName)
+
+    def calcMetrics(self):
+        self.window = QtWidgets.QDialog()
+        self.ui = Ui_metricsWindow()
+        self.ui.setupUi(self.window)
+        self.window.show()
+        MainWindow.close()
 
 
 if __name__ == "__main__":
