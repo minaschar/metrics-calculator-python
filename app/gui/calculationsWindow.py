@@ -9,15 +9,18 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+# import main window
+# from mainWindow import Ui_MainWindow
 
 
 class Ui_metricsWindow(object):
     def setupUi(self, metricsWindow):
         metricsWindow.setObjectName("metricsWindow")
-        metricsWindow.setFixedSize(846, 725)
+        # set the size
+        metricsWindow.setFixedSize(846, 762)
         metricsWindow.setStyleSheet("background-color:#224562;")
         self.projectNameLbl_2 = QtWidgets.QLabel(metricsWindow)
-        self.projectNameLbl_2.setGeometry(QtCore.QRect(40, 30, 331, 31))
+        self.projectNameLbl_2.setGeometry(QtCore.QRect(40, 30, 731, 31))
         font = QtGui.QFont()
         font.setPointSize(16)
         font.setBold(True)
@@ -26,7 +29,7 @@ class Ui_metricsWindow(object):
         self.projectNameLbl_2.setStyleSheet("color: #FFD43B;")
         self.projectNameLbl_2.setObjectName("projectNameLbl_2")
         self.nocLbl = QtWidgets.QLabel(metricsWindow)
-        self.nocLbl.setGeometry(QtCore.QRect(600, 50, 211, 20))
+        self.nocLbl.setGeometry(QtCore.QRect(550, 70, 261, 20))
         font = QtGui.QFont()
         font.setPointSize(8)
         font.setBold(False)
@@ -35,7 +38,7 @@ class Ui_metricsWindow(object):
         self.nocLbl.setStyleSheet("color: #FFD43B;")
         self.nocLbl.setObjectName("nocLbl")
         self.exportExcelBtn = QtWidgets.QPushButton(metricsWindow)
-        self.exportExcelBtn.setGeometry(QtCore.QRect(430, 650, 291, 51))
+        self.exportExcelBtn.setGeometry(QtCore.QRect(430, 670, 291, 51))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -45,19 +48,8 @@ class Ui_metricsWindow(object):
                                           "font-weight: bold;\n"
                                           "background-color: #00A300;")
         self.exportExcelBtn.setObjectName("exportExcelBtn")
-        self.helpBtn = QtWidgets.QPushButton(metricsWindow)
-        self.helpBtn.setGeometry(QtCore.QRect(800, 680, 31, 31))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(True)
-        font.setWeight(75)
-        self.helpBtn.setFont(font)
-        self.helpBtn.setStyleSheet("color:white;\n"
-                                   "font-weight: bold;\n"
-                                   "background-color: #B68F05;")
-        self.helpBtn.setObjectName("helpBtn")
         self.backMainBtn = QtWidgets.QPushButton(metricsWindow)
-        self.backMainBtn.setGeometry(QtCore.QRect(140, 650, 241, 51))
+        self.backMainBtn.setGeometry(QtCore.QRect(140, 670, 241, 51))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -68,7 +60,7 @@ class Ui_metricsWindow(object):
                                        "background-color: #B68F05;;")
         self.backMainBtn.setObjectName("backMainBtn")
         self.metricsTbl = QtWidgets.QTableWidget(metricsWindow)
-        self.metricsTbl.setGeometry(QtCore.QRect(30, 80, 791, 541))
+        self.metricsTbl.setGeometry(QtCore.QRect(30, 100, 791, 541))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.metricsTbl.setFont(font)
@@ -81,17 +73,32 @@ class Ui_metricsWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.metricsTbl.setItem(0, 0, item)
         self.metricsTbl.verticalHeader().setMinimumSectionSize(23)
+        self.helpBtn_2 = QtWidgets.QToolButton(metricsWindow)
+        self.helpBtn_2.setGeometry(QtCore.QRect(790, 710, 31, 31))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.helpBtn_2.setFont(font)
+        self.helpBtn_2.setStyleSheet("color:white;\n"
+                                     "font-weight: bold;\n"
+                                     "background-color: #B68F05;")
+        self.helpBtn_2.setObjectName("helpBtn_2")
+
+        # set click listeners
+        # self.backMainBtn.clicked.connect(self.backToMain)
 
         self.retranslateUi(metricsWindow)
         QtCore.QMetaObject.connectSlotsByName(metricsWindow)
 
     def retranslateUi(self, metricsWindow):
         _translate = QtCore.QCoreApplication.translate
-        metricsWindow.setWindowTitle(_translate("metricsWindow", "Dialog"))
+        metricsWindow.setWindowTitle(_translate("metricsWindow", "Calculations"))
+        # set favicon
+        metricsWindow.setWindowIcon(QtGui.QIcon("gui\\../resources/images/favicons/favicon.png"))
         self.projectNameLbl_2.setText(_translate("metricsWindow", "Metrics for {{Project_name}}"))
         self.nocLbl.setText(_translate("metricsWindow", "Classes Found (NOC Metric) = {{Number}}"))
         self.exportExcelBtn.setText(_translate("metricsWindow", "Export Results to Excel File"))
-        self.helpBtn.setText(_translate("metricsWindow", "?"))
         self.backMainBtn.setText(_translate("metricsWindow", "Back to main screen"))
         self.metricsTbl.setSortingEnabled(False)
         __sortingEnabled = self.metricsTbl.isSortingEnabled()
@@ -99,6 +106,15 @@ class Ui_metricsWindow(object):
         item = self.metricsTbl.item(0, 0)
         item.setText(_translate("metricsWindow", "Test"))
         self.metricsTbl.setSortingEnabled(__sortingEnabled)
+        self.helpBtn_2.setText(_translate("metricsWindow", "?"))
+
+    # method that goes to main
+    # def backToMain(self):
+    #     self.window = QtWidgets.QMainWindow()
+    #     self.ui = Ui_MainWindow()
+    #     self.ui.setupUi(self.window)
+    #     self.window.show()
+    #     metricsWindow.close()
 
 
 if __name__ == "__main__":
