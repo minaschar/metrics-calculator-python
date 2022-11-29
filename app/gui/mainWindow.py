@@ -11,9 +11,21 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 # import metrics ui
 from gui.calculationsWindow import Ui_metricsWindow
+import sys
+from src.metrics.calculator.metrics_calculator import MetricsCalculator
+from src.entities.project import Project
+from src.generator.generate_ast import ASTGenerator
+from src.visitors.visitor import *
+
+
 
 
 class Ui_MainWindow(object):
+
+
+    def __init__(self, MainWindow): 
+        self.window = MainWindow
+   
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
@@ -131,18 +143,45 @@ class Ui_MainWindow(object):
 
     # method that opens file dialog
     def openFiles(self):
-        fileName = QtWidgets.QFileDialog.getExistingDirectory()
+        self.fileName = QtWidgets.QFileDialog.getExistingDirectory()
 
-        if(fileName):
-            self.selectedProjectLbl.setText(fileName)
+        if(self.fileName):
+            self.selectedProjectLbl.setText(self.fileName)
 
     # method that calculates metrics
     def calcMetrics(self):
-        self.window = QtWidgets.QDialog()
+        test_project_name = "Game"
+        project = Project(self.fileName, test_project_name)
+        ASTGenerator(project).start_parsing()
+
+        # Init existing classes for each .py file of the project
+        for python_file in project.get_files():
+            Init_Visitor(python_file).visit_Module(python_file.get_generated_ast())
+
+        # Calculate Metrics for each class
+        for python_file in project.get_files():
+            for classObj in python_file.getFileClasses():
+                MetricsCalculator(classObj)
+
+        # # Testing - print Data
+        for python_file in project.get_files():
+            for classObj in python_file.getFileClasses():
+                print(f"Class: {classObj.get_name()}")
+                for method in classObj.get_methods().keys():
+                    print(f"  Method: {method}")
+                for field in classObj.get_fields():
+                    print(f"  Field: {field}")
+
+
+        # Testing - print Metrics
+        print(f"Classes in Project: {MetricsCalculator.calcNOC(project.get_files())}")
+
+
+        self.calculationsWindow = QtWidgets.QDialog()
         self.ui = Ui_metricsWindow()
-        self.ui.setupUi(self.window)
-        self.window.show()
-        MainWindow.close()
+        self.ui.setupUi(self.calculationsWindow, project)
+        self.calculationsWindow.show()
+        self.window.close()
 
 
 if __name__ == "__main__":

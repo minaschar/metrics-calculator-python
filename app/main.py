@@ -40,18 +40,27 @@ for python_file in project.get_files():
 # Testing - print Metrics
 print(f"Classes in Project: {MetricsCalculator.calcNOC(project.get_files())}")
 
-for python_file in project.get_files():
-    for classObj in python_file.getFileClasses():
-        print(f"Class name: {classObj.getClassAstNode().name}")
-        print(f"WMPC2: {classObj.getComplexityCategoryMetrics().getWMPC2()}")
-        print(f"WMPC1: {classObj.getComplexityCategoryMetrics().getWMPC1()}")
-        print(f"NOM: {classObj.getSizeCategoryMetrics().getNOM()}")
-        print(f"MPC: {classObj.getCouplingCategoryMetrics().get_MPC()}")
-        print(f"SIZE2: {classObj.getSizeCategoryMetrics().getSIZE2()}")
-        print(f"WAC: {classObj.getSizeCategoryMetrics().getWAC()}")
-        print(f"LCOM: {classObj.getCohesionCategoryMetrics().get_LCOM()}")
-        print(f"RFC: {classObj.getComplexityCategoryMetrics().getRFC()}")
-        print(f"CBO: {classObj.getCouplingCategoryMetrics().get_CBO()}")
-        print(f"LOC: {classObj.getSizeCategoryMetrics().getLOC()}")
-        print(f"NOCC: {classObj.getSizeCategoryMetrics().getNOCC()}")
-        print(f"DIT: {classObj.getComplexityCategoryMetrics().getDIT()}")
+# for python_file in project.get_files():
+#     for classObj in python_file.getFileClasses():
+#         print(f"Class name: {classObj.getClassAstNode().name}")
+#         print(f"WMPC2: {classObj.getComplexityCategoryMetrics().getWMPC2()}")
+#         print(f"WMPC1: {classObj.getComplexityCategoryMetrics().getWMPC1()}")
+#         print(f"NOM: {classObj.getSizeCategoryMetrics().getNOM()}")
+#         print(f"MPC: {classObj.getCouplingCategoryMetrics().get_MPC()}")
+#         print(f"SIZE2: {classObj.getSizeCategoryMetrics().getSIZE2()}")
+#         print(f"WAC: {classObj.getSizeCategoryMetrics().getWAC()}")
+#         print(f"LCOM: {classObj.getCohesionCategoryMetrics().get_LCOM()}")
+#         print(f"RFC: {classObj.getComplexityCategoryMetrics().getRFC()}")
+#         print(f"CBO: {classObj.getCouplingCategoryMetrics().get_CBO()}")
+#         print(f"LOC: {classObj.getSizeCategoryMetrics().getLOC()}")
+#         print(f"NOCC: {classObj.getSizeCategoryMetrics().getNOCC()}")
+#         print(f"DIT: {classObj.getComplexityCategoryMetrics().getDIT()}")
+
+
+import sys
+app = QtWidgets.QApplication(sys.argv)
+MainWindow = QtWidgets.QMainWindow()
+ui = Ui_MainWindow()
+ui.setupUi(MainWindow)
+MainWindow.show()
+sys.exit(app.exec_())
