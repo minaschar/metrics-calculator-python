@@ -128,7 +128,8 @@ class Hierarchy_Visitor(ast.NodeVisitor):
     def visit_ClassDef(self, node):
         if (len(node.bases)):
             for superClass in node.bases:
-                self.parent_classes_list.append(superClass.id)
+                if (isinstance(superClass, ast.Name)):
+                    self.parent_classes_list.append(superClass.id)
             return self.parent_classes_list
         else:
             return []
@@ -240,7 +241,7 @@ class LOC_Visitor(ast.NodeVisitor):
         self.loc = 0
 
     def visit_ClassDef(self, node):
-        file_fullpath = self.classObj.getPyFileObj().getProject().get_root_folder_path() + "/" + self.classObj.getPyFileObj().get_path()
+        file_fullpath = self.classObj.getPyFileObj().get_fullpath()
 
         self.loc += (node.end_lineno - node.lineno + 1)
         self.loc -= self.removeEmptyLines(file_fullpath, node.lineno, node.end_lineno)
