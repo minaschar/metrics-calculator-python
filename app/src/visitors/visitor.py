@@ -35,7 +35,6 @@ class Init_Visitor(ast.NodeVisitor):
                 self.visit_FunctionDef(child)
             # In else, we are outside of the methods, so we will visit this part
             elif (isinstance(child, ast.Assign)):
-                print(ast.dump(child))
                 AttrVisitor(classObj).generic_visit(child)
 
     # Visit the node of a method in a class
@@ -124,7 +123,6 @@ class Hierarchy_Visitor(ast.NodeVisitor):
 
     def __init__(self, classObj):
         self.classObj = classObj
-        self.parent_classes = 0
         self.parent_classes_list = []
 
     def visit_ClassDef(self, node):
@@ -198,9 +196,12 @@ class CC_Visitor(ast.NodeVisitor):
         for child in node.body:
             if(isinstance(child, ast.FunctionDef)):
                 # Need to increase every time because we use the type nodes with condition + 1 for each function
-                self.cc += 1
-                self.generic_visit(child)
+                self.visit_FunctionDef(child)
         return self.cc
+
+    def visit_FunctionDef(self, node):
+        self.cc += 1
+        self.generic_visit(node)
 
     # We dont need to check for else in loop because from there the program will execute sequentially each time after the completion of the loop
     def visit_For(self, node):
