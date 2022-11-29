@@ -33,6 +33,8 @@ class Init_Visitor(ast.NodeVisitor):
             # We will visit the whole node of a method
             if (isinstance(child, ast.FunctionDef)):
                 self.visit_FunctionDef(child)
+            elif (isinstance(child, ast.ClassDef)):
+                self.visit_ClassDef(child)
             else:
                 # In else, we are outside of the methods, so we will visit this part
                 AttrVisitor(classObj).visit(child)

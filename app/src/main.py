@@ -8,7 +8,7 @@ from visitors.visitor import *
 # C:/Users/John/Desktop/game-master-t (path for Panos' testing)
 # C:/Users/Money Maker/Documents/ProjectForTesting (path for Dionisis' testing)
 
-test_root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting"
+test_root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/SpecialTests"
 
 test_project_name = "Game"
 project = Project(test_root_folder_path, test_project_name)
