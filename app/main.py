@@ -3,6 +3,7 @@ from src.metrics.calculator.metrics_calculator import MetricsCalculator
 from src.entities.project import Project
 from src.generator.generate_ast import ASTGenerator
 from src.visitors.visitor import *
+from src.visitors.init_visitor import *
 from gui.mainWindow import Ui_MainWindow
 from PyQt5 import QtWidgets
 
