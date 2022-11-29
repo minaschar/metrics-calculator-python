@@ -1,7 +1,7 @@
 import ast
 import os
-from entities.project import Project
-from entities.python_file import Python_File
+from src.entities.project import Project
+from src.entities.python_file import Python_File
 
 
 class ASTGenerator:

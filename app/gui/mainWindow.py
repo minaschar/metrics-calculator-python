@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 # import metrics ui
-from calculationsWindow import Ui_metricsWindow
+from gui.calculationsWindow import Ui_metricsWindow
 
 
 class Ui_MainWindow(object):

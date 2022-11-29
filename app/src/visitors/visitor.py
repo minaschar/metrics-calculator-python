@@ -1,12 +1,12 @@
 import ast
 # from sys import orig_argv
-from metrics.categories.cohesion_category import CohesionCategory
-from metrics.categories.coupling_category import CouplingCategory
-from metrics.categories.qmood_category import QMOODCategory
-from metrics.categories.size_category import SizeCategory
-from metrics.categories.complexity_category import ComplexityCategory
-from entities.python_file import Python_File
-from entities.classDecl import Class
+from src.metrics.categories.cohesion_category import CohesionCategory
+from src.metrics.categories.coupling_category import CouplingCategory
+from src.metrics.categories.qmood_category import QMOODCategory
+from src.metrics.categories.size_category import SizeCategory
+from src.metrics.categories.complexity_category import ComplexityCategory
+from src.entities.python_file import Python_File
+from src.entities.classDecl import Class
 
 
 class Init_Visitor(ast.NodeVisitor):

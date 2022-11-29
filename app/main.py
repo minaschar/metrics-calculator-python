@@ -1,7 +1,10 @@
-from metrics.calculator.metrics_calculator import MetricsCalculator
-from entities.project import Project
-from generator.generate_ast import ASTGenerator
-from visitors.visitor import *
+import sys
+from src.metrics.calculator.metrics_calculator import MetricsCalculator
+from src.entities.project import Project
+from src.generator.generate_ast import ASTGenerator
+from src.visitors.visitor import *
+from gui.mainWindow import Ui_MainWindow
+from PyQt5 import QtWidgets
 
 # project path to test the code
 # C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting (path for Minas' testing)
