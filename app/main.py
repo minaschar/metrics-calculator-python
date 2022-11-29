@@ -3,6 +3,7 @@ from src.metrics.calculator.metrics_calculator import MetricsCalculator
 from src.entities.project import Project
 from src.generator.generate_ast import ASTGenerator
 from src.visitors.visitor import *
+from src.visitors.init_visitor import *
 from gui.mainWindow import Ui_MainWindow
 from PyQt5 import QtWidgets
 
@@ -11,7 +12,7 @@ from PyQt5 import QtWidgets
 # C:/Users/John/Desktop/game-master-t (path for Panos' testing)
 # C:/Users/Money Maker/Documents/ProjectForTesting (path for Dionisis' testing)
 
-test_root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/SpecialTests"
+test_root_folder_path = "C:/Users/User/Desktop/UoM/Parsers/ProjectForTesting"
 
 test_project_name = "Game"
 project = Project(test_root_folder_path, test_project_name)

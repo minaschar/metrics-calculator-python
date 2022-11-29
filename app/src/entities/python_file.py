@@ -14,6 +14,9 @@ class Python_File:
     def get_path(self):
         return self.file_name
 
+    def get_fullpath(self):
+        return self.file_path
+
     def getProject(self):
         return self.project
 

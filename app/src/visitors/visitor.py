@@ -1,71 +1,4 @@
 import ast
-# from sys import orig_argv
-from src.metrics.categories.cohesion_category import CohesionCategory
-from src.metrics.categories.coupling_category import CouplingCategory
-from src.metrics.categories.qmood_category import QMOODCategory
-from src.metrics.categories.size_category import SizeCategory
-from src.metrics.categories.complexity_category import ComplexityCategory
-from src.entities.python_file import Python_File
-from src.entities.classDecl import Class
-
-
-class Init_Visitor(ast.NodeVisitor):
-
-    def __init__(self, python_file):
-        self.python_file = python_file
-        self.currClass = None
-
-    # Visit the node of the whole .py file
-    def visit_Module(self, node):
-        # We need for loop because in one .py file can be more than one classes
-        for child in node.body:
-            # We want to start analyzing only for classes and no for non oop code
-            if (isinstance(child, ast.ClassDef)):
-                self.visit_ClassDef(child)
-
-    # Visit the node of a class
-    def visit_ClassDef(self, node):
-        # Create class instance
-        classObj = Class(node.name, self.python_file, node, CohesionCategory(), ComplexityCategory(), CouplingCategory(), QMOODCategory(), SizeCategory())
-        self.currClass = classObj
-        self.python_file.addClass(classObj)
-        for child in node.body:
-            # We will visit the whole node of a method
-            if (isinstance(child, ast.FunctionDef)):
-                self.visit_FunctionDef(child)
-            elif (isinstance(child, ast.ClassDef)):
-                self.visit_ClassDef(child)
-            else:
-                # In else, we are outside of the methods, so we will visit this part
-                AttrVisitor(classObj).visit(child)
-
-    # Visit the node of a method in a class
-    def visit_FunctionDef(self, node):
-        # Get method arguments
-        arguments = [arg.arg for arg in node.args.args]
-        self.currClass.add_method(node.name, arguments)
-        self.generic_visit(node)
-
-    # Visitor to get instance attributes and class attributes that declared in method's body!
-    def visit_Attribute(self, node):
-        if (isinstance(node.ctx, ast.Store)):
-            # Instance attributes
-            if (node.value.id == "self"):
-                self.currClass.add_field("self." + node.attr)
-            # Class attributes that declared inside a method
-            elif (node.value.id == self.currClass.get_name()):
-                self.currClass.add_field(self.currClass.get_name() + "." + node.attr)
-
-
-class AttrVisitor(ast.NodeVisitor):
-
-    def __init__(self, classObj):
-        self.classObj = classObj
-
-    # Visitor to get ONLY class attributes that declared outside of methods!
-    def visit_Name(self, node):
-        if (isinstance(node.ctx, ast.Store)):
-            self.classObj.add_field(self.classObj.get_name() + "." + node.id)
 
 
 class LCOM_Visitor(ast.NodeVisitor):
@@ -123,13 +56,13 @@ class Hierarchy_Visitor(ast.NodeVisitor):
 
     def __init__(self, classObj):
         self.classObj = classObj
-        self.parent_classes = 0
         self.parent_classes_list = []
 
     def visit_ClassDef(self, node):
         if (len(node.bases)):
             for superClass in node.bases:
-                self.parent_classes_list.append(superClass.id)
+                if (isinstance(superClass, ast.Name)):
+                    self.parent_classes_list.append(superClass.id)
             return self.parent_classes_list
         else:
             return []
@@ -197,9 +130,12 @@ class CC_Visitor(ast.NodeVisitor):
         for child in node.body:
             if(isinstance(child, ast.FunctionDef)):
                 # Need to increase every time because we use the type nodes with condition + 1 for each function
-                self.cc += 1
-                self.generic_visit(child)
+                self.visit_FunctionDef(child)
         return self.cc
+
+    def visit_FunctionDef(self, node):
+        self.cc += 1
+        self.generic_visit(node)
 
     # We dont need to check for else in loop because from there the program will execute sequentially each time after the completion of the loop
     def visit_For(self, node):
@@ -238,7 +174,7 @@ class LOC_Visitor(ast.NodeVisitor):
         self.loc = 0
 
     def visit_ClassDef(self, node):
-        file_fullpath = self.classObj.getPyFileObj().getProject().get_root_folder_path() + "/" + self.classObj.getPyFileObj().get_path()
+        file_fullpath = self.classObj.getPyFileObj().get_fullpath()
 
         self.loc += (node.end_lineno - node.lineno + 1)
         self.loc -= self.removeEmptyLines(file_fullpath, node.lineno, node.end_lineno)
