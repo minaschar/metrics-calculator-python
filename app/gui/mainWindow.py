@@ -169,15 +169,6 @@ class Ui_MainWindow(object):
                 for classObj in python_file.getFileClasses():
                     MetricsCalculator(classObj)
 
-            # # Testing - print Data
-            for python_file in project.get_files():
-                for classObj in python_file.getFileClasses():
-                    print(f"Class: {classObj.get_name()}")
-                    for method in classObj.get_methods().keys():
-                        print(f"  Method: {method}")
-                    for field in classObj.get_fields():
-                        print(f"  Field: {field}")
-
             self.calculationsWindow = QtWidgets.QDialog()
             self.ui = Ui_metricsWindow()
             self.ui.setupUi(self.calculationsWindow, project, self.window)

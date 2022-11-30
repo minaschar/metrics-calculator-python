@@ -21,8 +21,8 @@ class MetricsCalculator:
         self.calcLCOM()
         self.calcLOC()
         self.calcRFC()
-        self.calcNOCC()
-        self.calcDIT()
+        # self.calcNOCC()
+        # self.calcDIT()
         self.calcWMPC1()
 
     # Count the Classes that exists in the whole project.
