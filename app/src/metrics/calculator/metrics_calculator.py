@@ -133,12 +133,16 @@ class MetricsCalculator:
         self.classObj.getCouplingCategoryMetrics().set_CBO(len(elementsNoLibrary))
 
     def calcWMPC1(self):
-        class_cc = CC_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())
         class_nom = len(self.classObj.get_methods())
-        self.classObj.getComplexityCategoryMetrics().setWMPC1(round(class_cc / class_nom, 2))
+        if (class_nom > 0):
+            class_cc = CC_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())
+            self.classObj.getComplexityCategoryMetrics().setWMPC1(round(class_cc / class_nom, 2))
+        else:
+            self.classObj.getComplexityCategoryMetrics().setWMPC1(0.0)
 
 
 ##################### Methods necessary for NOCC and DIT calculation #####################
+
 
     def returnChildren(self, classInQuestion):
         allParentClasses = []

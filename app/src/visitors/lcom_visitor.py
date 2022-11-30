@@ -20,6 +20,5 @@ class LCOM_Visitor(ast.NodeVisitor):
         self.fields.clear()  # Clear the set to can be used from the next method
 
     def visit_Attribute(self, node):
-        print(ast.dump(node))
         if (isinstance(node.value, ast.Name)):
             self.fields.add(node.value.id + "." + node.attr)
