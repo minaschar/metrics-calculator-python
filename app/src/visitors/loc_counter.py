@@ -19,7 +19,7 @@ class LOC_Visitor(ast.NodeVisitor):
         lineCount = 0
         emptyLines = 0
 
-        with open(file) as file:
+        with open(file, "r", encoding='utf-8') as file:
             lines = file.readlines()
             for line in lines:
                 lineCount += 1
