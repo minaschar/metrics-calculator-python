@@ -10,13 +10,16 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from src.metrics.calculator.metrics_calculator import MetricsCalculator
+from gui.metricsManualWindow import Ui_Dialog
 # import main window
 # from mainWindow import Ui_MainWindow
 
 
 class Ui_metricsWindow(object):
-    def setupUi(self, metricsWindow, project):
+    def setupUi(self, metricsWindow, project, mainWindow):
+        self.mainWindow = mainWindow
         self.project = project
+        self.window = metricsWindow
         self.classes = MetricsCalculator.calcNOC(self.project.get_files())
         metricsWindow.setObjectName("metricsWindow")
         # set the size
@@ -71,12 +74,13 @@ class Ui_metricsWindow(object):
         self.metricsTbl.setShowGrid(True)
         self.metricsTbl.setGridStyle(QtCore.Qt.DashLine)
         self.metricsTbl.setRowCount(self.classes + 1)
-        self.metricsTbl.setColumnCount(12)
+        self.metricsTbl.setColumnCount(13)
         self.metricsTbl.setObjectName("metricsTbl")
         classNameLbl = QtWidgets.QTableWidgetItem()
         locLbl = QtWidgets.QTableWidgetItem()
         nomLbl = QtWidgets.QTableWidgetItem()
         size2Lbl = QtWidgets.QTableWidgetItem()
+        wacLbl = QtWidgets.QTableWidgetItem()
         noccLbl = QtWidgets.QTableWidgetItem()
         ditLbl = QtWidgets.QTableWidgetItem()
         wmpc1Lbl = QtWidgets.QTableWidgetItem()
@@ -98,35 +102,38 @@ class Ui_metricsWindow(object):
                 self.metricsTbl.setItem(index, 3, QtWidgets.QTableWidgetItem())
                 self.metricsTbl.item(index, 3).setText(_translate("metricsWindow", str(classObj.getSizeCategoryMetrics().getSIZE2())))
                 self.metricsTbl.setItem(index, 4, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 4).setText(_translate("metricsWindow", str(classObj.getSizeCategoryMetrics().getNOCC())))
+                self.metricsTbl.item(index, 4).setText(_translate("metricsWindow", str(classObj.getSizeCategoryMetrics().getWAC())))
                 self.metricsTbl.setItem(index, 5, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 5).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getDIT())))
+                self.metricsTbl.item(index, 5).setText(_translate("metricsWindow", str(classObj.getSizeCategoryMetrics().getNOCC())))
                 self.metricsTbl.setItem(index, 6, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 6).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getWMPC1())))
+                self.metricsTbl.item(index, 6).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getDIT())))
                 self.metricsTbl.setItem(index, 7, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 7).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getWMPC2())))
+                self.metricsTbl.item(index, 7).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getWMPC1())))
                 self.metricsTbl.setItem(index, 8, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 8).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getRFC())))
+                self.metricsTbl.item(index, 8).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getWMPC2())))
                 self.metricsTbl.setItem(index, 9, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 9).setText(_translate("metricsWindow", str(classObj.getCouplingCategoryMetrics().get_CBO())))
+                self.metricsTbl.item(index, 9).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getRFC())))
                 self.metricsTbl.setItem(index, 10, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 10).setText(_translate("metricsWindow", str(classObj.getCouplingCategoryMetrics().get_MPC())))
+                self.metricsTbl.item(index, 10).setText(_translate("metricsWindow", str(classObj.getCouplingCategoryMetrics().get_CBO())))
                 self.metricsTbl.setItem(index, 11, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 11).setText(_translate("metricsWindow", str(classObj.getCohesionCategoryMetrics().get_LCOM())))
+                self.metricsTbl.item(index, 11).setText(_translate("metricsWindow", str(classObj.getCouplingCategoryMetrics().get_MPC())))
+                self.metricsTbl.setItem(index, 12, QtWidgets.QTableWidgetItem())
+                self.metricsTbl.item(index, 12).setText(_translate("metricsWindow", str(classObj.getCohesionCategoryMetrics().get_LCOM())))
                 index += 1
 
         self.metricsTbl.setItem(0, 0, classNameLbl)
         self.metricsTbl.setItem(0, 1, locLbl)
         self.metricsTbl.setItem(0, 2, nomLbl)
         self.metricsTbl.setItem(0, 3, size2Lbl)
-        self.metricsTbl.setItem(0, 4, noccLbl)
-        self.metricsTbl.setItem(0, 5, ditLbl)
-        self.metricsTbl.setItem(0, 6, wmpc1Lbl)
-        self.metricsTbl.setItem(0, 7, wmpc2Lbl)
-        self.metricsTbl.setItem(0, 8, rfcLbl)
-        self.metricsTbl.setItem(0, 9, cboLbl)
-        self.metricsTbl.setItem(0, 10, mpcLbl)
-        self.metricsTbl.setItem(0, 11, lcomLbl)
+        self.metricsTbl.setItem(0, 4, wacLbl)
+        self.metricsTbl.setItem(0, 5, noccLbl)
+        self.metricsTbl.setItem(0, 6, ditLbl)
+        self.metricsTbl.setItem(0, 7, wmpc1Lbl)
+        self.metricsTbl.setItem(0, 8, wmpc2Lbl)
+        self.metricsTbl.setItem(0, 9, rfcLbl)
+        self.metricsTbl.setItem(0, 10, cboLbl)
+        self.metricsTbl.setItem(0, 11, mpcLbl)
+        self.metricsTbl.setItem(0, 12, lcomLbl)
         self.metricsTbl.verticalHeader().setMinimumSectionSize(23)
         self.helpBtn_2 = QtWidgets.QToolButton(metricsWindow)
         self.helpBtn_2.setGeometry(QtCore.QRect(790, 710, 31, 31))
@@ -141,7 +148,8 @@ class Ui_metricsWindow(object):
         self.helpBtn_2.setObjectName("helpBtn_2")
 
         # set click listeners
-        # self.backMainBtn.clicked.connect(self.backToMain)
+        self.backMainBtn.clicked.connect(self.backToMain)
+        self.helpBtn_2.clicked.connect(self.openManual)
 
         self.retranslateUi(metricsWindow)
         QtCore.QMetaObject.connectSlotsByName(metricsWindow)
@@ -150,7 +158,9 @@ class Ui_metricsWindow(object):
         _translate = QtCore.QCoreApplication.translate
         metricsWindow.setWindowTitle(_translate("metricsWindow", "Calculations"))
         # set favicon
-        metricsWindow.setWindowIcon(QtGui.QIcon("gui\\../resources/images/favicons/favicon.png"))
+        import os
+        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        metricsWindow.setWindowIcon(QtGui.QIcon(scriptDir + '\\resources\images\\favicons\\favicon.png'))
         self.projectNameLbl_2.setText(_translate("metricsWindow", "Metrics for " + self.project.get_name()))
         self.nocLbl.setText(_translate("metricsWindow", "Classes Found (NOC Metric) = " + str(self.classes)))
         self.exportExcelBtn.setText(_translate("metricsWindow", "Export Results to Excel File"))
@@ -166,33 +176,39 @@ class Ui_metricsWindow(object):
         nomLbl.setText(_translate("metricsWindow", "NOM"))
         size2Lbl = self.metricsTbl.item(0, 3)
         size2Lbl.setText(_translate("metricsWindow", "SIZE2"))
-        noccLbl = self.metricsTbl.item(0, 4)
+        wacLbl = self.metricsTbl.item(0, 4)
+        wacLbl.setText(_translate("metricsWindow", "WAC"))
+        noccLbl = self.metricsTbl.item(0, 5)
         noccLbl.setText(_translate("metricsWindow", "NOCC"))
-        ditLbl = self.metricsTbl.item(0, 5)
+        ditLbl = self.metricsTbl.item(0, 6)
         ditLbl.setText(_translate("metricsWindow", "DIT"))
-        wmpc1Lbl = self.metricsTbl.item(0, 6)
+        wmpc1Lbl = self.metricsTbl.item(0, 7)
         wmpc1Lbl.setText(_translate("metricsWindow", "WPMC1"))
-        wmpc2Lbl = self.metricsTbl.item(0, 7)
+        wmpc2Lbl = self.metricsTbl.item(0, 8)
         wmpc2Lbl.setText(_translate("metricsWindow", "WMPC2"))
-        rfcLbl = self.metricsTbl.item(0, 8)
+        rfcLbl = self.metricsTbl.item(0, 9)
         rfcLbl.setText(_translate("metricsWindow", "RFC"))
-        cboLbl = self.metricsTbl.item(0, 9)
+        cboLbl = self.metricsTbl.item(0, 10)
         cboLbl.setText(_translate("metricsWindow", "CBO"))
-        mpcLbl = self.metricsTbl.item(0, 10)
+        mpcLbl = self.metricsTbl.item(0, 11)
         mpcLbl.setText(_translate("metricsWindow", "MPC"))
-        lcomLbl = self.metricsTbl.item(0, 11)
+        lcomLbl = self.metricsTbl.item(0, 12)
         lcomLbl.setText(_translate("metricsWindow", "LCOM"))
 
         self.metricsTbl.setSortingEnabled(__sortingEnabled)
         self.helpBtn_2.setText(_translate("metricsWindow", "?"))
 
     # method that goes to main
-    # def backToMain(self):
-    #     self.window = QtWidgets.QMainWindow()
-    #     self.ui = Ui_MainWindow()
-    #     self.ui.setupUi(self.window)
-    #     self.window.show()
-    #     metricsWindow.close()
+    def backToMain(self):
+        self.mainWindow.show()
+        self.window.close()
+
+    def openManual(self):
+        self.manualWindow = QtWidgets.QDialog()
+        self.ui = Ui_Dialog()
+        self.ui.setupUi(self.manualWindow, self.window)
+        self.manualWindow.show()
+        self.window.close()
 
 
 if __name__ == "__main__":

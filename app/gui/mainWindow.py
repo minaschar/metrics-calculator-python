@@ -11,6 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 # import metrics ui
 from gui.calculationsWindow import Ui_metricsWindow
+from gui.metricsManualWindow import Ui_Dialog
 import sys
 from src.metrics.calculator.metrics_calculator import MetricsCalculator
 from src.entities.project import Project
@@ -111,7 +112,9 @@ class Ui_MainWindow(object):
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(310, 90, 181, 71))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("gui\\../resources/images/logos/Python_metrics_logo.png"))
+        import os
+        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        self.label.setPixmap(QtGui.QPixmap(scriptDir + '\\resources\images\\logos\\Python_metrics_logo.png'))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -122,6 +125,7 @@ class Ui_MainWindow(object):
        # set click listeners
         self.openFolderButton.clicked.connect(self.openFiles)
         self.calculateBtn.clicked.connect(self.calcMetrics)
+        self.helpBtn.clicked.connect(self.openManual)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -131,7 +135,9 @@ class Ui_MainWindow(object):
         # set title
         MainWindow.setWindowTitle(_translate("MainWindow", "Python Metrics Calculator"))
         # set favicon
-        MainWindow.setWindowIcon(QtGui.QIcon("gui\\../resources/images/favicons/favicon.png"))
+        import os
+        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        MainWindow.setWindowIcon(QtGui.QIcon(scriptDir + '\\resources\images\\favicons\\favicon.png'))
         self.calculateBtn.setText(_translate("MainWindow", "START CALCULATING ⮞"))
         self.openFolderButton.setText(_translate("MainWindow", "Open Folder"))
         self.nameLbl.setText(_translate("MainWindow", "Metrics Calculator"))
@@ -144,12 +150,12 @@ class Ui_MainWindow(object):
     def openFiles(self):
         self.fileName = QtWidgets.QFileDialog.getExistingDirectory()
 
-        if(self.fileName):
+        if (self.fileName):
             self.selectedProjectLbl.setText(self.fileName.split('/')[-1])
 
     # method that calculates metrics
     def calcMetrics(self):
-        if(self.fileName != ''):
+        if (self.fileName != ''):
             test_project_name = self.fileName.split('/')[-1]
             project = Project(self.fileName, test_project_name)
             ASTGenerator(project).start_parsing()
@@ -174,11 +180,18 @@ class Ui_MainWindow(object):
 
             self.calculationsWindow = QtWidgets.QDialog()
             self.ui = Ui_metricsWindow()
-            self.ui.setupUi(self.calculationsWindow, project)
+            self.ui.setupUi(self.calculationsWindow, project, self.window)
             self.calculationsWindow.show()
             self.window.close()
-        elif(self.fileName == ''):
+        elif (self.fileName == ''):
             self.selectedProjectLbl.setText("You must select a Project")
+
+    def openManual(self):
+        self.manualWindow = QtWidgets.QDialog()
+        self.ui = Ui_Dialog()
+        self.ui.setupUi(self.manualWindow, self.window)
+        self.manualWindow.show()
+        self.window.close()
 
 
 if __name__ == "__main__":
