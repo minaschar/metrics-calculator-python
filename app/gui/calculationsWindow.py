@@ -10,13 +10,16 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from src.metrics.calculator.metrics_calculator import MetricsCalculator
+from gui.metricsManualWindow import Ui_Dialog
 # import main window
 # from mainWindow import Ui_MainWindow
 
 
 class Ui_metricsWindow(object):
-    def setupUi(self, metricsWindow, project):
+    def setupUi(self, metricsWindow, project, mainWindow):
+        self.mainWindow = mainWindow
         self.project = project
+        self.window = metricsWindow
         self.classes = MetricsCalculator.calcNOC(self.project.get_files())
         metricsWindow.setObjectName("metricsWindow")
         # set the size
@@ -141,7 +144,8 @@ class Ui_metricsWindow(object):
         self.helpBtn_2.setObjectName("helpBtn_2")
 
         # set click listeners
-        # self.backMainBtn.clicked.connect(self.backToMain)
+        self.backMainBtn.clicked.connect(self.backToMain)
+        self.helpBtn_2.clicked.connect(self.openManual)
 
         self.retranslateUi(metricsWindow)
         QtCore.QMetaObject.connectSlotsByName(metricsWindow)
@@ -150,7 +154,7 @@ class Ui_metricsWindow(object):
         _translate = QtCore.QCoreApplication.translate
         metricsWindow.setWindowTitle(_translate("metricsWindow", "Calculations"))
         # set favicon
-        metricsWindow.setWindowIcon(QtGui.QIcon("gui\\../resources/images/favicons/favicon.png"))
+        metricsWindow.setWindowIcon(QtGui.QIcon("/metrics-calculator-python/app/resourses/images/favicons/favicon.png"))
         self.projectNameLbl_2.setText(_translate("metricsWindow", "Metrics for " + self.project.get_name()))
         self.nocLbl.setText(_translate("metricsWindow", "Classes Found (NOC Metric) = " + str(self.classes)))
         self.exportExcelBtn.setText(_translate("metricsWindow", "Export Results to Excel File"))
@@ -187,12 +191,16 @@ class Ui_metricsWindow(object):
         self.helpBtn_2.setText(_translate("metricsWindow", "?"))
 
     # method that goes to main
-    # def backToMain(self):
-    #     self.window = QtWidgets.QMainWindow()
-    #     self.ui = Ui_MainWindow()
-    #     self.ui.setupUi(self.window)
-    #     self.window.show()
-    #     metricsWindow.close()
+    def backToMain(self):
+        self.mainWindow.show()
+        self.window.close()
+
+    def openManual(self):
+        self.manualWindow = QtWidgets.QDialog()
+        self.ui = Ui_Dialog()
+        self.ui.setupUi(self.manualWindow, self.window)
+        self.manualWindow.show()
+        self.window.close()
 
 
 if __name__ == "__main__":
