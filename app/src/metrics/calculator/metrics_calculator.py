@@ -1,5 +1,7 @@
 from os import listdir
 from os.path import isfile, join
+from src.visitors.loc_counter import LOC_Visitor
+from src.visitors.cc_visitor import CC_Visitor
 from src.visitors.visitor import *
 from src.entities.classDecl import Class
 
