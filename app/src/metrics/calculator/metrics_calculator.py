@@ -1,3 +1,4 @@
+from src.visitors.remote_methods_called_visitor import MethodsCalled_Visitor
 from src.visitors.loc_counter import LOC_Visitor
 from src.visitors.cc_visitor import CC_Visitor
 from src.visitors.lcom_visitor import LCOM_Visitor
@@ -80,7 +81,8 @@ class MetricsCalculator:
 
     # Calculate RFC Metric
     def calcRFC(self):
-        remoteMethodsSum = len(MethodsCalled_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()))
+        # We convert to set because we want to remove common method calls. We sum the methods, not the calls
+        remoteMethodsSum = len(set(MethodsCalled_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())))
         self.classObj.getComplexityCategoryMetrics().setRFC(self.classObj.getSizeCategoryMetrics().getNOM() + remoteMethodsSum)
 
     # Calculate NOCC Metric
@@ -114,7 +116,8 @@ class MetricsCalculator:
 
     # Calculate MPC Metric
     def calcMPC(self):
-        messages = MPC_Visitor(self.classObj).visit(self.classObj.getClassAstNode())
+        # We sum all the calls
+        messages = len(MethodsCalled_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()))
 
         self.classObj.getCouplingCategoryMetrics().set_MPC(messages)
 
