@@ -21,8 +21,8 @@ class MetricsCalculator:
         self.calcLCOM()
         self.calcLOC()
         self.calcRFC()
-        # self.calcNOCC()
-        # self.calcDIT()
+        self.calcNOCC()
+        self.calcDIT(classObj)
         self.calcWMPC1()
 
     # Count the Classes that exists in the whole project.
@@ -91,22 +91,23 @@ class MetricsCalculator:
         self.classObj.getSizeCategoryMetrics().setNOCC(myClassChildrenClasses)
 
     # Calculate DIT Metric
-    def calcDIT(self):
+    def calcDIT(self, aParentClassObject):
+        self.currDitClass = aParentClassObject
         # Class is not in any hierarchy
-        if ((Hierarchy_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()) == []) and (len(self.returnChildren(self.classObj)) == 0)):
-            self.classObj.getComplexityCategoryMetrics().setDIT(0)
-            self.classObj.set_hierarchy(0)
-        elif ((Hierarchy_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()) == []) and (len(self.returnChildren(self.classObj)) != 0)):
-            self.classObj.getComplexityCategoryMetrics().setDIT(1)
-            self.classObj.set_hierarchy(1)
+        if ((Hierarchy_Visitor(self.currDitClass).visit_ClassDef(self.currDitClass.getClassAstNode()) == []) and (len(self.returnChildren(self.currDitClass)) == 0)):
+            self.currDitClass.getComplexityCategoryMetrics().setDIT(0)
+            self.currDitClass.set_hierarchy(0)
+        elif ((Hierarchy_Visitor(self.currDitClass).visit_ClassDef(self.currDitClass.getClassAstNode()) == []) and (len(self.returnChildren(self.currDitClass)) != 0)):
+            self.currDitClass.getComplexityCategoryMetrics().setDIT(1)
+            self.currDitClass.set_hierarchy(1)
         else:
-            myParentClassesNamesOnly = Hierarchy_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())
+            myParentClassesNamesOnly = Hierarchy_Visitor(self.currDitClass).visit_ClassDef(self.currDitClass.getClassAstNode())
 
             # Converting simple name pointers to actually object classes
-            myParentClassesObjects = self.convertToActualParentObjects(self.classObj, myParentClassesNamesOnly)
-            maxParentDepth = self.returnMaxParentDepth(self.classObj, myParentClassesObjects)
-            self.classObj.getComplexityCategoryMetrics().setDIT(maxParentDepth + 1)
-            self.classObj.set_hierarchy(maxParentDepth + 1)
+            myParentClassesObjects = self.convertToActualParentObjects(self.currDitClass, myParentClassesNamesOnly)
+            maxParentDepth = self.returnMaxParentDepth(myParentClassesObjects)
+            self.currDitClass.getComplexityCategoryMetrics().setDIT(maxParentDepth + 1)
+            self.currDitClass.set_hierarchy(maxParentDepth + 1)
 
     # Calculate LOC Metric
     def calcLOC(self):
@@ -143,7 +144,6 @@ class MetricsCalculator:
 
 ##################### Methods necessary for NOCC and DIT calculation #####################
 
-
     def returnChildren(self, classInQuestion):
         allParentClasses = []
         myClassChildrenClasses = 0
@@ -166,7 +166,7 @@ class MetricsCalculator:
                         myParentClassesObjects.append(classObj)
         return myParentClassesObjects
 
-    def returnMaxParentDepth(self, classInQuestion, myParentClassesObjects):
+    def returnMaxParentDepth(self, myParentClassesObjects):
         maxParentDIT = -2
         for aParentClassObject in myParentClassesObjects:
             if (aParentClassObject.get_hierarchy() == -1):

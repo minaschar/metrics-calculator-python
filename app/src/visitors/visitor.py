@@ -38,6 +38,8 @@ class Hierarchy_Visitor(ast.NodeVisitor):
             for superClass in node.bases:
                 if (isinstance(superClass, ast.Name)):
                     self.parent_classes_list.append(superClass.id)
+                # elif (isinstance(superClass, ast.Attribute)):
+                #     self.parent_classes_list.append(superClass.attr)
             return self.parent_classes_list
         else:
             return []
