@@ -1,9 +1,9 @@
+from src.visitors.methods_called_outside_visitor import CBO_Visitor
 from src.visitors.remote_methods_called_visitor import MethodsCalled_Visitor
 from src.visitors.loc_counter import LOC_Visitor
 from src.visitors.cc_visitor import CC_Visitor
 from src.visitors.lcom_visitor import LCOM_Visitor
 from src.visitors.hierarchy_visitor import Hierarchy_Visitor
-from src.visitors.visitor import *
 from src.entities.classDecl import Class
 
 
@@ -13,17 +13,17 @@ class MetricsCalculator:
     def __init__(self, classObj: Class):
         self.classObj = classObj
         self.calcWMPC2()
+        self.calcWMPC1()
         self.calcNOM()
         self.calcSIZE2()
         self.calcWAC()
         self.calcMPC()
-        self.calcCBO()
         self.calcLCOM()
         self.calcLOC()
         self.calcRFC()
         self.calcNOCC()
         self.calcDIT(classObj)
-        self.calcWMPC1()
+        self.calcCBO()
 
     # Count the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
@@ -123,17 +123,17 @@ class MetricsCalculator:
 
     # Calculate CBO Metric
     def calcCBO(self):
-        elements = CBO_Visitor(self.classObj).visit(self.classObj.getClassAstNode())
-        elementsNoLibrary = set()
-        keys = [k for k, v in elements.items()]
-        for phythonFile in self.classObj.getPyFileObj().getProject().get_files():
-            for classofFile in phythonFile.getFileClasses():
-                if(classofFile.get_name() in keys):
-                    for c, method in elements.items():
-                        if(method in classofFile.get_methods().keys()):
-                            elementsNoLibrary.add(c)
+        # We store all the methods that called, and belongs to other classes. Methods from libraries are not included
+        methods_that_called = MethodsCalled_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())
+        # We store all the class name or instance names that used to call methods from other classes in the project. Classes and methods from libraries are not included
+        class_uses = set()
+        for method in methods_that_called:
+            part1 = method.split(".", 2)
+            class_uses.add(part1[0])
 
-        self.classObj.getCouplingCategoryMetrics().set_CBO(len(elementsNoLibrary))
+        self.classObj.getCouplingCategoryMetrics().set_CBO(len(class_uses) +
+                                                           len(Hierarchy_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())) +
+                                                           self.classObj.getSizeCategoryMetrics().getNOCC())
 
     def calcWMPC1(self):
         class_nom = len(self.classObj.get_methods())
@@ -145,6 +145,7 @@ class MetricsCalculator:
 
 
 ##################### Methods necessary for NOCC and DIT calculation #####################
+
 
     def returnChildren(self, classInQuestion):
         allParentClasses = []
