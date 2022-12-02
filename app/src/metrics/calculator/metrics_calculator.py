@@ -145,9 +145,10 @@ class MetricsCalculator:
             # parts[0] will have the instance name or the class name that calls the method
             class_uses.add(parts[0])
 
-        self.class_obj.get_coupling_category_metrics().set_cbo(len(class_uses) +
-                                                               len(HierarchyNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())) +
-                                                               self.class_obj.get_size_category_metrics().get_nocc())
+        # In class_uses now we will have the union of parent class names and of classes that their methods are used in the current class
+        class_uses = class_uses.union(set(HierarchyNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())))
+
+        self.class_obj.get_coupling_category_metrics().set_cbo(len(class_uses) + self.class_obj.get_size_category_metrics().get_nocc())
 
     # Calculate WMPC1 metric, by adding the cc of the whole class and divide by the nom
     def calc_wmpc1(self):
