@@ -23,6 +23,7 @@ class LOCNodeVisitor(ast.NodeVisitor):
             lines = file.readlines()
             for line in lines:
                 line_count += 1
+                # This if will check if we are in the class block. We want to remove empty lines that exists in the current class block, not in the whole .py file
                 if (line_count >= class_start_line and line_count <= class_last_line):
                     if (len(line.strip()) == 0):
                         empty_lines += 1

@@ -21,16 +21,19 @@ class AstGenerator:
                     # open text file in read mode
                     python_file = open(full_file_path, "r", encoding='UTF8')
                     data_from_python_file_str = python_file.read()  # read whole file to a string
-                    python_file.close()
+                    python_file.close()  # Close the stream after reading the file
                     self.create_ast(data_from_python_file_str, file, full_file_path)
 
-    def create_ast(self, python_file_str, file, full_file_path):
+    def create_ast(self, python_file_str, file_name, full_file_path):
         python_file_obj = None
         try:
-            generated_ast_tree = ast.parse(python_file_str, filename=file, mode='exec', type_comments=False, feature_version=None)
-            python_file_obj = PythonFile(self.project_obj, file, full_file_path, generated_ast_tree)
+            # Create ast node for the whole .py file
+            generated_ast_tree = ast.parse(python_file_str, filename=file_name, mode='exec', type_comments=False, feature_version=None)
+            # Create new file object
+            python_file_obj = PythonFile(self.project_obj, file_name, full_file_path, generated_ast_tree)
         except SyntaxError:
             # Here we can first convert code from python 2.0 to python 3.0
             print("not parsed")
         if python_file_obj != None:
+            # Add file to the project object
             self.project_obj.add_python_file(python_file_obj)

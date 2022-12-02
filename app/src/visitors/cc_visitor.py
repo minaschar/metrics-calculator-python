@@ -5,6 +5,7 @@ class CCNodeVisitor(ast.NodeVisitor):
 
     def __init__(self, class_obj):
         self.class_obj = class_obj
+        # The value of cc will increased for every node that can change the program flow
         self.cc = 0
 
     def visit_ClassDef(self, node):

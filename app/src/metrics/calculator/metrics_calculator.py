@@ -24,7 +24,7 @@ class MetricsCalculator:
         self.calc_dit(class_obj)
         self.calc_cbo()
 
-    # Count the Classes that exists in the whole project.
+    # Calculate NOC metric, by counting the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
     @staticmethod
     def calc_noc(project_files):
@@ -34,38 +34,45 @@ class MetricsCalculator:
 
         return noc
 
-    # Count the number of methods a class
+    # Calculate NOM metric, by counting the number of methods a class
     def calc_nom(self):
+        # We only need to get the length of the methods dictionary in the class object
         self.class_obj.get_size_category_metrics().set_nom(len(self.class_obj.get_methods()))
 
-    # Calculate wmpc2 metric
+    # Calculate WMPC2 metric, by adding the number of the methods in the class + num of the parameters for each method in the class
+    # The wmpc2 metrics based on that a method with more parameters in more complex that other with parameters
     def calc_wmpc2(self):
         num_of_params = 0
 
-        # In args_size we have the count of parameters for each function in a class
+        # In params_size we have the count of parameters for each function in a class
         params_size = [len(args) for args in self.class_obj.get_methods().values()]
 
         # We count all parameters in the class
         for params in params_size:
             num_of_params += params
 
+        # Store the sum of the nom and num_of_param
         self.class_obj.get_complexity_category_metrics().set_wmpc2(len(self.class_obj.get_methods()) + num_of_params)
 
-    # Count the number of methods and fields for each class in the project
+    # Calculate SIZE2 metric, by counting the number of methods and fields for each class in the project
     def calc_size2(self):
+        # We need to sum only the lengths of each data structure
         self.class_obj.get_size_category_metrics().set_size2(len(self.class_obj.get_methods()) + len(self.class_obj.get_fields()))
 
-    # Count the number of fields for each class
+    # Calculate WAC metric, by counting the number of fields for each class
     def calc_wac(self):
+        # We need to only get the length of the list that keeps all the fields of the class
         self.class_obj.get_size_category_metrics().set_wac(len(self.class_obj.get_fields()))
 
-    # Calculate LCOM Metric
+    # Calculate NOC metric, by subtracting coherent from non-cohesive pairs
     def calc_lcom(self):
         cohesive = 0
         non_cohesive = 0
 
+        # A dictionary where keeps the method name and value a set with all the class and instance attributes that the method use
         uses_in_methods = LCOMNodeVisitor(self.class_obj).visit(self.class_obj.get_class_ast_node())
 
+        # Get the intersection between the methods
         for i in range(0, len(uses_in_methods), 1):
             for j in range(i + 1, len(uses_in_methods), 1):
                 if (len(list(set(list(uses_in_methods.values())[i]).intersection(list(uses_in_methods.values())[j])))) == 0:
@@ -78,15 +85,14 @@ class MetricsCalculator:
         else:
             self.class_obj.get_cohesion_category_metrics().set_lcom(non_cohesive - cohesive)
 
-    # Calculate RFC Metric
+    # Calculate RFC Metric, by sum the nom and the method calls of other classes
     def calc_rfc(self):
-        # We convert to set because we want to remove common method calls. We sum the methods, not the calls
+        # We convert to set because we want to remove common method calls. We sum the methods that called, not the calls
         remote_methods_sum = len(set(MethodsCalledNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())))
         self.class_obj.get_complexity_category_metrics().set_rfc(self.class_obj.get_size_category_metrics().get_nom() + remote_methods_sum)
 
     # Calculate NOCC Metric
     def calc_nocc(self):
-
         my_class_children_classes = len(self.return_children(self.class_obj))
         self.class_obj.get_size_category_metrics().set_nocc(my_class_children_classes)
 
@@ -109,37 +115,42 @@ class MetricsCalculator:
             self.curr_dit_class.get_complexity_category_metrics().set_dit(max_parent_depth + 1)
             self.curr_dit_class.set_hierarchy(max_parent_depth + 1)
 
-    # Calculate LOC Metric
+    # Calculate LOC metric, by counting lines of code for each class. Empty lines not added
     def calc_loc(self):
         self.class_obj.get_size_category_metrics().set_loc(LOCNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node()))
 
-    # Calculate MPC Metric
+    # Calculate MPC Metric, by adding all the calls of methods that declared in other classes
     def calc_mpc(self):
         # We sum all the calls
         messages = len(MethodsCalledNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node()))
 
         self.class_obj.get_coupling_category_metrics().set_mpc(messages)
 
-    # Calculate CBO Metric
+    # Calculate CBO Metric. As coupling between classes we consider the heredity and the message passing between the classes
+    # Classes in libraries not inluded in the calculation
     def calc_cbo(self):
         # We store all the methods that called, and belongs to other classes. Methods from libraries are not included
         methods_that_called = MethodsCalledNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())
         # We store all the class name or instance names that used to call methods from other classes in the project. Classes and methods from libraries are not included
         class_uses = set()
         for method in methods_that_called:
-            part1 = method.split(".", 2)
-            class_uses.add(part1[0])
+            parts = method.split(".", 2)
+            # parts[0] will have the instance name or the class name that calls the method
+            class_uses.add(parts[0])
 
         self.class_obj.get_coupling_category_metrics().set_cbo(len(class_uses) +
                                                                len(HierarchyNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())) +
                                                                self.class_obj.get_size_category_metrics().get_nocc())
 
+    # Calculate WMPC1 metric, by adding the cc of the whole class and divide by the nom
     def calc_wmpc1(self):
         class_nom = len(self.class_obj.get_methods())
+
         if (class_nom > 0):
             class_cc = CCNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())
             self.class_obj.get_complexity_category_metrics().set_wmpc1(round(class_cc / class_nom, 2))
         else:
+            # If there no methods, wmpcs1 is equal to 0
             self.class_obj.get_complexity_category_metrics().set_wmpc1(0.0)
 
 
@@ -147,9 +158,9 @@ class MetricsCalculator:
 
 
     def return_children(self, class_in_question):
-        all_parent_classes = []
+        all_parent_classes = list()
         my_class_children_classes = 0
-        my_class_children_classes_list = []
+        my_class_children_classes_list = list()
         for python_file_obj in class_in_question.get_python_file_obj().get_project_obj().get_files():
             for class_obj in python_file_obj.get_file_classes():
                 all_parent_classes = all_parent_classes + HierarchyNodeVisitor(class_obj).visit_ClassDef(class_obj.get_class_ast_node())
@@ -160,7 +171,7 @@ class MetricsCalculator:
         return my_class_children_classes_list
 
     def convert_to_actual_parent_objects(self, class_in_question, my_parent_classes_names_only):
-        my_parent_classes_objects = []
+        my_parent_classes_objects = list()
         for python_file_obj in class_in_question.get_python_file_obj().get_project_obj().get_files():
             for class_obj in python_file_obj.get_file_classes():
                 for class_name_only in my_parent_classes_names_only:

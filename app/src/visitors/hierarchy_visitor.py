@@ -5,7 +5,7 @@ class HierarchyNodeVisitor(ast.NodeVisitor):
 
     def __init__(self, class_obj):
         self.class_obj = class_obj
-        self.parent_classes_list = []
+        self.parent_classes_list = list()
 
     def visit_ClassDef(self, node):
         if (len(node.bases)):

@@ -11,12 +11,13 @@ from src.visitors.class_attr_visitor import ClassAttrNodeVisitor
 class InitCommonsNodeVisitor(ast.NodeVisitor):
 
     def __init__(self, python_file):
+        # The current python file/module we scan
         self.python_file = python_file
         self.curr_class = None
 
     # Visit the node of the whole .py file
     def visit_Module(self, node):
-        # We need for loop because in one .py file can be more than one classes
+        # We need for loop because in one .py file can be more than one classes and nested classes
         for child in ast.walk(node):
             # We want to start analyzing only for classes and no for non oop code
             if (isinstance(child, ast.ClassDef)):
@@ -32,13 +33,13 @@ class InitCommonsNodeVisitor(ast.NodeVisitor):
             # We will visit the whole node of a method
             if (isinstance(child, ast.FunctionDef)):
                 self.visit_FunctionDef(child)
-            # In else, we are outside of the methods, so we will visit this part
+            # In else, we are outside of the methods, so we will visit this part to get the class attributes
             elif (isinstance(child, ast.Assign)):
                 ClassAttrNodeVisitor(class_obj).generic_visit(child)
 
     # Visit the node of a method in a class
     def visit_FunctionDef(self, node):
-        # Get method arguments
+        # Get method parameters
         parameters = [arg.arg for arg in node.args.args]
         self.curr_class.add_method(node.name, parameters)
         # continue searching deeper in ast nodes

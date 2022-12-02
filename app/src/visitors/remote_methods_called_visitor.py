@@ -35,6 +35,7 @@ class MethodsCalledNodeVisitor(ast.NodeVisitor):
         else:
             self.generic_visit(node)
 
+    # Insure that the method that is called, exists in other class in the project
     def validate_remote_method(self, method_name_called, instance_calling_name):
         if (instance_calling_name != "self" and instance_calling_name != self.class_obj.get_class_name()):
             for python_file_obj in self.class_obj.get_python_file_obj().get_project_obj().get_files():

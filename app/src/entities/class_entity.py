@@ -3,12 +3,19 @@ class Class:
 
     def __init__(self, class_name, python_file_obj, class_ast_node, cohesion_category_metrics,
                  complexity_category_metrics, coupling_category_metrics, qmood_category_metrics, size_category_metrics):
+        # The name of the class node we checking
         self.class_name = class_name
+        # The object of the python file that the class declared to
         self.python_file_obj = python_file_obj
+        # The ast node for the whole class block
         self.class_ast_node = class_ast_node
+        # A dictionary with key the method name and value a list of the parameters of that method
         self.methods = dict()
-        self.fields = set()  # All class attributes and instance attributes
+        # All class attributes and instance attributes of the class
+        self.fields = set()
+        # The level of hierarchy of the class
         self.hierarchy = -1
+        # Init objects that will keep the softawre quality metrics for the class
         self.cohesion_category_metrics = cohesion_category_metrics
         self.complexity_category_metrics = complexity_category_metrics
         self.coupling_category_metrics = coupling_category_metrics
