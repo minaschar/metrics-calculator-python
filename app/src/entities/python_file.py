@@ -16,7 +16,7 @@ class PythonFile:
     def get_project_obj(self):
         return self.project_obj
 
-    def get_path(self):
+    def get_file_name(self):
         return self.file_name
 
     def get_file_full_path(self):
