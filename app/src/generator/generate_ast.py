@@ -18,11 +18,16 @@ class AstGenerator:
                     full_file_path = os.path.join(root, file)
                     # fix the path format
                     full_file_path = full_file_path.replace("\\", "/")
-                    # open text file in read mode
-                    python_file = open(full_file_path, "r", encoding='UTF8')
-                    data_from_python_file_str = python_file.read()  # read whole file to a string
-                    python_file.close()  # Close the stream after reading the file
-                    self.create_ast(data_from_python_file_str, file, full_file_path)
+                    try:
+                        # open text file in read mode
+                        python_file = open(full_file_path, "r", encoding='UTF8')
+                        data_from_python_file_str = python_file.read()  # read whole file to a string
+                        python_file.close()  # Close the stream after reading the file
+                        self.create_ast(data_from_python_file_str, file, full_file_path)
+                    except ValueError as error:
+                        print(error)
+                    except:
+                        print("Can't read file.")
 
     def create_ast(self, python_file_str, file_name, full_file_path):
         python_file_obj = None

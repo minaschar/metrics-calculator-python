@@ -20,12 +20,17 @@ class LOCNodeVisitor(ast.NodeVisitor):
         empty_lines = 0
 
         with open(file_full_path, "r", encoding='utf-8') as file:
-            lines = file.readlines()
-            for line in lines:
-                line_count += 1
-                # This if will check if we are in the class block. We want to remove empty lines that exists in the current class block, not in the whole .py file
-                if (line_count >= class_start_line and line_count <= class_last_line):
-                    if (len(line.strip()) == 0):
-                        empty_lines += 1
+            try:
+                lines = file.readlines()
+                for line in lines:
+                    line_count += 1
+                    # This if will check if we are in the class block. We want to remove empty lines that exists in the current class block, not in the whole .py file
+                    if (line_count >= class_start_line and line_count <= class_last_line):
+                        if (len(line.strip()) == 0):
+                            empty_lines += 1
+            except ValueError as error:
+                print(error)
+            except:
+                print("Can't read file")
 
         return empty_lines

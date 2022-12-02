@@ -3,13 +3,12 @@ from src.visitors.loc_counter import LOCNodeVisitor
 from src.visitors.cc_visitor import CCNodeVisitor
 from src.visitors.lcom_visitor import LCOMNodeVisitor
 from src.visitors.hierarchy_visitor import HierarchyNodeVisitor
-from src.entities.class_entity import Class
 
 
 # In this class exists methods that calculates metrics for the whole project
 class MetricsCalculator:
 
-    def __init__(self, class_obj: Class):
+    def __init__(self, class_obj):
         self.class_obj = class_obj
         self.calc_wmpc2()
         self.calc_wmpc1()
