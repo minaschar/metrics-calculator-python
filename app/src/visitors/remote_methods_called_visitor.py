@@ -32,7 +32,6 @@ class MethodsCalled_Visitor(ast.NodeVisitor):
                 methodNameCalled = node.attr
                 instanceCallingName = node.value.func.id
                 self.validateRemoteMethod(methodNameCalled, instanceCallingName)
-
         else:
             self.generic_visit(node)
 
@@ -42,3 +41,4 @@ class MethodsCalled_Visitor(ast.NodeVisitor):
                 for classObj in pythonFile.getFileClasses():
                     if (methodNameCalled and methodNameCalled in classObj.get_methods().keys()):
                         self.called.append(instanceCallingName + "." + methodNameCalled)
+                        break

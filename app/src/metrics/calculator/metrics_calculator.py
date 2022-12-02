@@ -1,4 +1,3 @@
-from src.visitors.methods_called_outside_visitor import CBO_Visitor
 from src.visitors.remote_methods_called_visitor import MethodsCalled_Visitor
 from src.visitors.loc_counter import LOC_Visitor
 from src.visitors.cc_visitor import CC_Visitor
