@@ -5,12 +5,12 @@ class Project:
         # The path that the project is in the local storage
         self.root_folder_path = root_folder_path
         self.project_name = project_name
-        self.python_files = []
+        self.python_files = list()
 
     def get_root_folder_path(self):
         return self.root_folder_path
 
-    def get_name(self):
+    def get_project_name(self):
         return self.project_name
 
     def add_python_file(self, python_file_obj):

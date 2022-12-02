@@ -1,10 +1,10 @@
 import ast
 
 
-class LCOM_Visitor(ast.NodeVisitor):
+class LCOMNodeVisitor(ast.NodeVisitor):
 
-    def __init__(self, classObj):
-        self.classObj = classObj
+    def __init__(self, class_obj):
+        self.class_obj = class_obj
         self.uses_in_method = {}  # A dictionary with key the function name and with value a list with the fields/attrs that the func
         self.fields = set()  # Keeps class and instance attributes for the current method
 

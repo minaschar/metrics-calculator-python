@@ -1,11 +1,11 @@
 class CohesionCategory:
 
-    LCOM = 0
+    lcom = 0
 
-# Metrics getters
-    def get_LCOM(self):
-        return self.LCOM
+    # Metrics getters
+    def get_lcom(self):
+        return self.lcom
 
-# Calculating the Metrics
-    def set_LCOM(self, value):
-        self.LCOM = value
+    # Set value to the Metrics
+    def set_lcom(self, value):
+        self.lcom = value

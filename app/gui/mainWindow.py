@@ -14,16 +14,16 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from gui.calculationsWindow import Ui_metricsWindow
 from gui.metricsManualWindow import Ui_Dialog
 from src.metrics.calculator.metrics_calculator import MetricsCalculator
-from src.entities.project import Project
-from src.generator.generate_ast import ASTGenerator
-from src.visitors.init_visitor import *
+from src.entities.the_project import Project
+from src.generator.generate_ast import AstGenerator
+from src.visitors.init_visitor import InitCommonsNodeVisitor
 
 
 class Ui_MainWindow(object):
 
     def __init__(self, MainWindow):
         self.window = MainWindow
-        self.fileName = ''
+        self.file_name = ''
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -147,33 +147,33 @@ class Ui_MainWindow(object):
 
     # method that opens file dialog
     def openFiles(self):
-        self.fileName = QtWidgets.QFileDialog.getExistingDirectory()
+        self.file_name = QtWidgets.QFileDialog.getExistingDirectory()
 
-        if (self.fileName):
-            self.selectedProjectLbl.setText(self.fileName.split('/')[-1])
+        if (self.file_name):
+            self.selectedProjectLbl.setText(self.file_name.split('/')[-1])
 
     # method that calculates metrics
     def calcMetrics(self):
-        if (self.fileName != ''):
-            test_project_name = self.fileName.split('/')[-1]
-            project = Project(self.fileName, test_project_name)
-            ASTGenerator(project).start_parsing()
+        if (self.file_name != ''):
+            test_project_name = self.file_name.split('/')[-1]
+            project = Project(self.file_name, test_project_name)
+            AstGenerator(project).start_parsing()
 
             # Init existing classes for each .py file of the project
-            for python_file in project.get_files():
-                Init_Visitor(python_file).visit_Module(python_file.get_generated_ast())
+            for python_file_obj in project.get_files():
+                InitCommonsNodeVisitor(python_file_obj).visit_Module(python_file_obj.get_generated_ast())
 
             # Calculate Metrics for each class
-            for python_file in project.get_files():
-                for classObj in python_file.getFileClasses():
-                    MetricsCalculator(classObj)
+            for python_file_obj in project.get_files():
+                for class_obj in python_file_obj.get_file_classes():
+                    MetricsCalculator(class_obj)
 
             self.calculationsWindow = QtWidgets.QDialog()
             self.ui = Ui_metricsWindow()
             self.ui.setupUi(self.calculationsWindow, project, self.window)
             self.calculationsWindow.show()
             self.window.close()
-        elif (self.fileName == ''):
+        elif (self.file_name == ''):
             self.selectedProjectLbl.setText("You must select a Project")
 
     def openManual(self):

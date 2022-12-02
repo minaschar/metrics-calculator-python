@@ -1,40 +1,40 @@
 
 class SizeCategory:
 
-    NOCC = 0
-    NOM = 0
-    LOC = 0
-    SIZE2 = 0
-    WAC = 0
+    nocc = 0
+    nom = 0
+    loc = 0
+    size2 = 0
+    wac = 0
 
-# Metrics getters
-    def getNOCC(self):
-        return self.NOCC
+    # Metrics getters
+    def get_nocc(self):
+        return self.nocc
 
-    def getNOM(self):
-        return self.NOM
+    def get_nom(self):
+        return self.nom
 
-    def getLOC(self):
-        return self.LOC
+    def get_loc(self):
+        return self.loc
 
-    def getSIZE2(self):
-        return self.SIZE2
+    def get_size2(self):
+        return self.size2
 
-    def getWAC(self):
-        return self.WAC
+    def get_wac(self):
+        return self.wac
 
-# Set value to the Metrics
-    def setNOCC(self, value):
-        self.NOCC = value
+    # Set value to the Metrics
+    def set_nocc(self, value):
+        self.nocc = value
 
-    def setNOM(self, value):
-        self.NOM = value
+    def set_nom(self, value):
+        self.nom = value
 
-    def setLOC(self, value):
-        self.LOC = value
+    def set_loc(self, value):
+        self.loc = value
 
-    def setSIZE2(self, value):
-        self.SIZE2 = value
+    def set_size2(self, value):
+        self.size2 = value
 
-    def setWAC(self, value):
-        self.WAC = value
+    def set_wac(self, value):
+        self.wac = value

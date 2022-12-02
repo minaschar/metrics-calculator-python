@@ -16,11 +16,11 @@ from gui.metricsManualWindow import Ui_Dialog
 
 
 class Ui_metricsWindow(object):
-    def setupUi(self, metricsWindow, project, mainWindow):
+    def setupUi(self, metricsWindow, project_obj, mainWindow):
         self.mainWindow = mainWindow
-        self.project = project
+        self.project_obj = project_obj
         self.window = metricsWindow
-        self.classes = MetricsCalculator.calcNOC(self.project.get_files())
+        self.classes = MetricsCalculator.calc_noc(self.project_obj.get_files())
         metricsWindow.setObjectName("metricsWindow")
         # set the size
         metricsWindow.setFixedSize(846, 762)
@@ -91,34 +91,34 @@ class Ui_metricsWindow(object):
         lcomLbl = QtWidgets.QTableWidgetItem()
         _translate = QtCore.QCoreApplication.translate
         index = 1
-        for python_file in self.project.get_files():
-            for classObj in python_file.getFileClasses():
+        for python_file_obj in self.project_obj.get_files():
+            for class_obj in python_file_obj.get_file_classes():
                 self.metricsTbl.setItem(index, 0, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 0).setText(_translate("metricsWindow", classObj.get_name()))
+                self.metricsTbl.item(index, 0).setText(_translate("metricsWindow", class_obj.get_class_name()))
                 self.metricsTbl.setItem(index, 1, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 1).setText(_translate("metricsWindow", str(classObj.getSizeCategoryMetrics().getLOC())))
+                self.metricsTbl.item(index, 1).setText(_translate("metricsWindow", str(class_obj.get_size_category_metrics().get_loc())))
                 self.metricsTbl.setItem(index, 2, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 2).setText(_translate("metricsWindow", str(classObj.getSizeCategoryMetrics().getNOM())))
+                self.metricsTbl.item(index, 2).setText(_translate("metricsWindow", str(class_obj.get_size_category_metrics().get_nom())))
                 self.metricsTbl.setItem(index, 3, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 3).setText(_translate("metricsWindow", str(classObj.getSizeCategoryMetrics().getSIZE2())))
+                self.metricsTbl.item(index, 3).setText(_translate("metricsWindow", str(class_obj.get_size_category_metrics().get_size2())))
                 self.metricsTbl.setItem(index, 4, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 4).setText(_translate("metricsWindow", str(classObj.getSizeCategoryMetrics().getWAC())))
+                self.metricsTbl.item(index, 4).setText(_translate("metricsWindow", str(class_obj.get_size_category_metrics().get_wac())))
                 self.metricsTbl.setItem(index, 5, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 5).setText(_translate("metricsWindow", str(classObj.getSizeCategoryMetrics().getNOCC())))
+                self.metricsTbl.item(index, 5).setText(_translate("metricsWindow", str(class_obj.get_size_category_metrics().get_nocc())))
                 self.metricsTbl.setItem(index, 6, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 6).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getDIT())))
+                self.metricsTbl.item(index, 6).setText(_translate("metricsWindow", str(class_obj.get_complexity_category_metrics().get_dit())))
                 self.metricsTbl.setItem(index, 7, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 7).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getWMPC1())))
+                self.metricsTbl.item(index, 7).setText(_translate("metricsWindow", str(class_obj.get_complexity_category_metrics().get_wmpc1())))
                 self.metricsTbl.setItem(index, 8, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 8).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getWMPC2())))
+                self.metricsTbl.item(index, 8).setText(_translate("metricsWindow", str(class_obj.get_complexity_category_metrics().get_wmpc2())))
                 self.metricsTbl.setItem(index, 9, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 9).setText(_translate("metricsWindow", str(classObj.getComplexityCategoryMetrics().getRFC())))
+                self.metricsTbl.item(index, 9).setText(_translate("metricsWindow", str(class_obj.get_complexity_category_metrics().get_rfc())))
                 self.metricsTbl.setItem(index, 10, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 10).setText(_translate("metricsWindow", str(classObj.getCouplingCategoryMetrics().get_CBO())))
+                self.metricsTbl.item(index, 10).setText(_translate("metricsWindow", str(class_obj.get_coupling_category_metrics().get_cbo())))
                 self.metricsTbl.setItem(index, 11, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 11).setText(_translate("metricsWindow", str(classObj.getCouplingCategoryMetrics().get_MPC())))
+                self.metricsTbl.item(index, 11).setText(_translate("metricsWindow", str(class_obj.get_coupling_category_metrics().get_mpc())))
                 self.metricsTbl.setItem(index, 12, QtWidgets.QTableWidgetItem())
-                self.metricsTbl.item(index, 12).setText(_translate("metricsWindow", str(classObj.getCohesionCategoryMetrics().get_LCOM())))
+                self.metricsTbl.item(index, 12).setText(_translate("metricsWindow", str(class_obj.get_cohesion_category_metrics().get_lcom())))
                 index += 1
 
         self.metricsTbl.setItem(0, 0, classNameLbl)
@@ -161,7 +161,7 @@ class Ui_metricsWindow(object):
         import os
         scriptDir = os.path.dirname(os.path.realpath(__file__))
         metricsWindow.setWindowIcon(QtGui.QIcon(scriptDir + '\\resources\images\\favicons\\favicon.png'))
-        self.projectNameLbl_2.setText(_translate("metricsWindow", "Metrics for " + self.project.get_name()))
+        self.projectNameLbl_2.setText(_translate("metricsWindow", "Metrics for " + self.project_obj.get_project_name()))
         self.nocLbl.setText(_translate("metricsWindow", "Classes Found (NOC Metric) = " + str(self.classes)))
         self.exportExcelBtn.setText(_translate("metricsWindow", "Export Results to Excel File"))
         self.backMainBtn.setText(_translate("metricsWindow", "Back to main screen"))

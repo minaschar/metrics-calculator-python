@@ -1,18 +1,18 @@
 class CouplingCategory:
 
-    CBO = 0
-    MPC = 0
+    cbo = 0
+    mpc = 0
 
-# Metrics getters
-    def get_CBO(self):
-        return self.CBO
+    # Metrics getters
+    def get_cbo(self):
+        return self.cbo
 
-    def get_MPC(self):
-        return self.MPC
+    def get_mpc(self):
+        return self.mpc
 
-# Calculating the Metrics
-    def set_CBO(self, value):
-        self.CBO = value
+    # Set value to the Metrics
+    def set_cbo(self, value):
+        self.cbo = value
 
-    def set_MPC(self, value):
-        self.MPC = value
+    def set_mpc(self, value):
+        self.mpc = value

@@ -1,10 +1,10 @@
 import ast
 
 
-class CC_Visitor(ast.NodeVisitor):
+class CCNodeVisitor(ast.NodeVisitor):
 
-    def __init__(self, classObj):
-        self.classObj = classObj
+    def __init__(self, class_obj):
+        self.class_obj = class_obj
         self.cc = 0
 
     def visit_ClassDef(self, node):

@@ -1,48 +1,46 @@
 class QMOODCategory:
 
-    Reusability = 0.0
-    Flexibility = 0.0
-    Understandability = 0.0
-    Functionality = 0.0
-    Extendability = 0.0
-    Effectiveness = 0.0
+    reusability = 0.0
+    flexibility = 0.0
+    understandability = 0.0
+    functionality = 0.0
+    extendability = 0.0
+    effectiveness = 0.0
 
-# Metrics getters
-    def get_Reusability(self):
-        return self.Reusability
+    # Metrics getters
+    def get_reusability(self):
+        return self.reusability
 
-    def get_Flexibility(self):
-        return self.Flexibility
+    def get_flexibility(self):
+        return self.flexibility
 
-    def get_Understandability(self):
-        return self.Understandability
+    def get_understandability(self):
+        return self.understandability
 
-    def get_Functionality(self):
-        return self.Functionality
+    def get_functionality(self):
+        return self.functionality
 
-    def get_Extendability(self):
-        return self.Extendability
+    def get_extendability(self):
+        return self.extendability
 
-    def get_Effectiveness(self):
-        return self.Effectiveness
+    def get_effectiveness(self):
+        return self.effectiveness
 
+    # Set value to the Metrics
+    def set_reusability(self, value):
+        self.reusability = value
 
-# Calculating the Metrics
+    def set_flexibility(self, value):
+        self.flexibility = value
 
-    def set_Reusability(self, value):
-        self.Reusability = value
+    def set_understandability(self, value):
+        self.understandability = value
 
-    def set_Flexibility(self, value):
-        self.Flexibility = value
+    def set_functionality(self, value):
+        self.functionality = value
 
-    def set_Understandability(self, value):
-        self.Understandability = value
+    def set_extendability(self, value):
+        self.extendability = value
 
-    def set_Functionality(self, value):
-        self.Functionality = value
-
-    def set_Extendability(self, value):
-        self.Extendability = value
-
-    def set_Effectiveness(self, value):
-        self.Effectiveness = value
+    def set_effectiveness(self, value):
+        self.effectiveness = value

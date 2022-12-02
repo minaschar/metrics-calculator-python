@@ -1,32 +1,32 @@
 class ComplexityCategory:
 
-    DIT = 0
-    RFC = 0
-    WMPC1 = 0.0
-    WMPC2 = 0
+    dit = 0
+    rfc = 0
+    wmpc1 = 0.0
+    wmpc2 = 0
 
-# Metrics getters
-    def getDIT(self):
-        return self.DIT
+    # Metrics getters
+    def get_dit(self):
+        return self.dit
 
-    def getRFC(self):
-        return self.RFC
+    def get_rfc(self):
+        return self.rfc
 
-    def getWMPC1(self):
-        return self.WMPC1
+    def get_wmpc1(self):
+        return self.wmpc1
 
-    def getWMPC2(self):
-        return self.WMPC2
+    def get_wmpc2(self):
+        return self.wmpc2
 
-# Set value to the Metrics
-    def setDIT(self, value):
-        self.DIT = value
+    # Set value to the Metrics
+    def set_dit(self, value):
+        self.dit = value
 
-    def setRFC(self, value):
-        self.RFC = value
+    def set_rfc(self, value):
+        self.rfc = value
 
-    def setWMPC1(self, value):
-        self.WMPC1 = value
+    def set_wmpc1(self, value):
+        self.wmpc1 = value
 
-    def setWMPC2(self, value):
-        self.WMPC2 = value
+    def set_wmpc2(self, value):
+        self.wmpc2 = value

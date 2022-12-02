@@ -1,70 +1,70 @@
-from src.visitors.remote_methods_called_visitor import MethodsCalled_Visitor
-from src.visitors.loc_counter import LOC_Visitor
-from src.visitors.cc_visitor import CC_Visitor
-from src.visitors.lcom_visitor import LCOM_Visitor
-from src.visitors.hierarchy_visitor import Hierarchy_Visitor
-from src.entities.classDecl import Class
+from src.visitors.remote_methods_called_visitor import MethodsCalledNodeVisitor
+from src.visitors.loc_counter import LOCNodeVisitor
+from src.visitors.cc_visitor import CCNodeVisitor
+from src.visitors.lcom_visitor import LCOMNodeVisitor
+from src.visitors.hierarchy_visitor import HierarchyNodeVisitor
+from src.entities.class_entity import Class
 
 
 # In this class exists methods that calculates metrics for the whole project
 class MetricsCalculator:
 
-    def __init__(self, classObj: Class):
-        self.classObj = classObj
-        self.calcWMPC2()
-        self.calcWMPC1()
-        self.calcNOM()
-        self.calcSIZE2()
-        self.calcWAC()
-        self.calcMPC()
-        self.calcLCOM()
-        self.calcLOC()
-        self.calcRFC()
-        self.calcNOCC()
-        self.calcDIT(classObj)
-        self.calcCBO()
+    def __init__(self, class_obj: Class):
+        self.class_obj = class_obj
+        self.calc_wmpc2()
+        self.calc_wmpc1()
+        self.calc_nom()
+        self.calc_size2()
+        self.calc_wac()
+        self.calc_mpc()
+        self.calc_lcom()
+        self.calc_loc()
+        self.calc_rfc()
+        self.calc_nocc()
+        self.calc_dit(class_obj)
+        self.calc_cbo()
 
     # Count the Classes that exists in the whole project.
     # The method will called only once time when we want to print the results
     @staticmethod
-    def calcNOC(files):
+    def calc_noc(project_files):
         noc = 0
-        for python_file in files:
-            noc += len(python_file.getFileClasses())
+        for python_file_obj in project_files:
+            noc += len(python_file_obj.get_file_classes())
 
         return noc
 
-    # Count the number of methods for each class in the project
-    def calcNOM(self):
-        self.classObj.getSizeCategoryMetrics().setNOM(len(self.classObj.get_methods()))
+    # Count the number of methods a class
+    def calc_nom(self):
+        self.class_obj.get_size_category_metrics().set_nom(len(self.class_obj.get_methods()))
 
-    # Count the number of methods for each class in the project
-    def calcWMPC2(self):
-        nop = 0
+    # Calculate wmpc2 metric
+    def calc_wmpc2(self):
+        num_of_params = 0
 
         # In args_size we have the count of parameters for each function in a class
-        args_size = [len(args) for args in self.classObj.get_methods().values()]
+        params_size = [len(args) for args in self.class_obj.get_methods().values()]
 
         # We count all parameters in the class
-        for size in args_size:
-            nop += size
+        for params in params_size:
+            num_of_params += params
 
-        self.classObj.getComplexityCategoryMetrics().setWMPC2(len(self.classObj.get_methods()) + nop)
+        self.class_obj.get_complexity_category_metrics().set_wmpc2(len(self.class_obj.get_methods()) + num_of_params)
 
     # Count the number of methods and fields for each class in the project
-    def calcSIZE2(self):
-        self.classObj.getSizeCategoryMetrics().setSIZE2(len(self.classObj.get_methods()) + len(self.classObj.get_fields()))
+    def calc_size2(self):
+        self.class_obj.get_size_category_metrics().set_size2(len(self.class_obj.get_methods()) + len(self.class_obj.get_fields()))
 
     # Count the number of fields for each class
-    def calcWAC(self):
-        self.classObj.getSizeCategoryMetrics().setWAC(len(self.classObj.get_fields()))
+    def calc_wac(self):
+        self.class_obj.get_size_category_metrics().set_wac(len(self.class_obj.get_fields()))
 
     # Calculate LCOM Metric
-    def calcLCOM(self):
+    def calc_lcom(self):
         cohesive = 0
         non_cohesive = 0
 
-        uses_in_methods = LCOM_Visitor(self.classObj).visit(self.classObj.getClassAstNode())
+        uses_in_methods = LCOMNodeVisitor(self.class_obj).visit(self.class_obj.get_class_ast_node())
 
         for i in range(0, len(uses_in_methods), 1):
             for j in range(i + 1, len(uses_in_methods), 1):
@@ -74,106 +74,106 @@ class MetricsCalculator:
                     cohesive += 1
 
         if (non_cohesive - cohesive < 0):
-            self.classObj.getCohesionCategoryMetrics().set_LCOM(0)
+            self.class_obj.get_cohesion_category_metrics().set_lcom(0)
         else:
-            self.classObj.getCohesionCategoryMetrics().set_LCOM(non_cohesive - cohesive)
+            self.class_obj.get_cohesion_category_metrics().set_lcom(non_cohesive - cohesive)
 
     # Calculate RFC Metric
-    def calcRFC(self):
+    def calc_rfc(self):
         # We convert to set because we want to remove common method calls. We sum the methods, not the calls
-        remoteMethodsSum = len(set(MethodsCalled_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())))
-        self.classObj.getComplexityCategoryMetrics().setRFC(self.classObj.getSizeCategoryMetrics().getNOM() + remoteMethodsSum)
+        remote_methods_sum = len(set(MethodsCalledNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())))
+        self.class_obj.get_complexity_category_metrics().set_rfc(self.class_obj.get_size_category_metrics().get_nom() + remote_methods_sum)
 
     # Calculate NOCC Metric
-    def calcNOCC(self):
+    def calc_nocc(self):
 
-        myClassChildrenClasses = len(self.returnChildren(self.classObj))
-        self.classObj.getSizeCategoryMetrics().setNOCC(myClassChildrenClasses)
+        my_class_children_classes = len(self.return_children(self.class_obj))
+        self.class_obj.get_size_category_metrics().set_nocc(my_class_children_classes)
 
     # Calculate DIT Metric
-    def calcDIT(self, aParentClassObject):
-        self.currDitClass = aParentClassObject
+    def calc_dit(self, a_parent_class_object):
+        self.curr_dit_class = a_parent_class_object
         # Class is not in any hierarchy
-        if ((Hierarchy_Visitor(self.currDitClass).visit_ClassDef(self.currDitClass.getClassAstNode()) == []) and (len(self.returnChildren(self.currDitClass)) == 0)):
-            self.currDitClass.getComplexityCategoryMetrics().setDIT(0)
-            self.currDitClass.set_hierarchy(0)
-        elif ((Hierarchy_Visitor(self.currDitClass).visit_ClassDef(self.currDitClass.getClassAstNode()) == []) and (len(self.returnChildren(self.currDitClass)) != 0)):
-            self.currDitClass.getComplexityCategoryMetrics().setDIT(1)
-            self.currDitClass.set_hierarchy(1)
+        if ((HierarchyNodeVisitor(self.curr_dit_class).visit_ClassDef(self.curr_dit_class.get_class_ast_node()) == []) and (len(self.return_children(self.curr_dit_class)) == 0)):
+            self.curr_dit_class.get_complexity_category_metrics().set_dit(0)
+            self.curr_dit_class.set_hierarchy(0)
+        elif ((HierarchyNodeVisitor(self.curr_dit_class).visit_ClassDef(self.curr_dit_class.get_class_ast_node()) == []) and (len(self.return_children(self.curr_dit_class)) != 0)):
+            self.curr_dit_class.get_complexity_category_metrics().set_dit(1)
+            self.curr_dit_class.set_hierarchy(1)
         else:
-            myParentClassesNamesOnly = Hierarchy_Visitor(self.currDitClass).visit_ClassDef(self.currDitClass.getClassAstNode())
+            my_parent_classes_names_only = HierarchyNodeVisitor(self.curr_dit_class).visit_ClassDef(self.curr_dit_class.get_class_ast_node())
 
             # Converting simple name pointers to actually object classes
-            myParentClassesObjects = self.convertToActualParentObjects(self.currDitClass, myParentClassesNamesOnly)
-            maxParentDepth = self.returnMaxParentDepth(myParentClassesObjects)
-            self.currDitClass.getComplexityCategoryMetrics().setDIT(maxParentDepth + 1)
-            self.currDitClass.set_hierarchy(maxParentDepth + 1)
+            my_parent_classes_objects = self.convert_to_actual_parent_objects(self.curr_dit_class, my_parent_classes_names_only)
+            max_parent_depth = self.return_max_parent_depth(my_parent_classes_objects)
+            self.curr_dit_class.get_complexity_category_metrics().set_dit(max_parent_depth + 1)
+            self.curr_dit_class.set_hierarchy(max_parent_depth + 1)
 
     # Calculate LOC Metric
-    def calcLOC(self):
-        self.classObj.getSizeCategoryMetrics().setLOC(LOC_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()))
+    def calc_loc(self):
+        self.class_obj.get_size_category_metrics().set_loc(LOCNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node()))
 
     # Calculate MPC Metric
-    def calcMPC(self):
+    def calc_mpc(self):
         # We sum all the calls
-        messages = len(MethodsCalled_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode()))
+        messages = len(MethodsCalledNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node()))
 
-        self.classObj.getCouplingCategoryMetrics().set_MPC(messages)
+        self.class_obj.get_coupling_category_metrics().set_mpc(messages)
 
     # Calculate CBO Metric
-    def calcCBO(self):
+    def calc_cbo(self):
         # We store all the methods that called, and belongs to other classes. Methods from libraries are not included
-        methods_that_called = MethodsCalled_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())
+        methods_that_called = MethodsCalledNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())
         # We store all the class name or instance names that used to call methods from other classes in the project. Classes and methods from libraries are not included
         class_uses = set()
         for method in methods_that_called:
             part1 = method.split(".", 2)
             class_uses.add(part1[0])
 
-        self.classObj.getCouplingCategoryMetrics().set_CBO(len(class_uses) +
-                                                           len(Hierarchy_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())) +
-                                                           self.classObj.getSizeCategoryMetrics().getNOCC())
+        self.class_obj.get_coupling_category_metrics().set_cbo(len(class_uses) +
+                                                               len(HierarchyNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())) +
+                                                               self.class_obj.get_size_category_metrics().get_nocc())
 
-    def calcWMPC1(self):
-        class_nom = len(self.classObj.get_methods())
+    def calc_wmpc1(self):
+        class_nom = len(self.class_obj.get_methods())
         if (class_nom > 0):
-            class_cc = CC_Visitor(self.classObj).visit_ClassDef(self.classObj.getClassAstNode())
-            self.classObj.getComplexityCategoryMetrics().setWMPC1(round(class_cc / class_nom, 2))
+            class_cc = CCNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())
+            self.class_obj.get_complexity_category_metrics().set_wmpc1(round(class_cc / class_nom, 2))
         else:
-            self.classObj.getComplexityCategoryMetrics().setWMPC1(0.0)
+            self.class_obj.get_complexity_category_metrics().set_wmpc1(0.0)
 
 
 ##################### Methods necessary for NOCC and DIT calculation #####################
 
 
-    def returnChildren(self, classInQuestion):
-        allParentClasses = []
-        myClassChildrenClasses = 0
-        myClassChildrenClassesList = []
-        for pythonFile in classInQuestion.getPyFileObj().getProject().get_files():
-            for classObj in pythonFile.getFileClasses():
-                allParentClasses = allParentClasses + Hierarchy_Visitor(classObj).visit_ClassDef(classObj.getClassAstNode())
-        for myClass in allParentClasses:
-            if (myClass == classInQuestion.name):
-                myClassChildrenClasses = myClassChildrenClasses + 1
-                myClassChildrenClassesList.append(myClass)
-        return myClassChildrenClassesList
+    def return_children(self, class_in_question):
+        all_parent_classes = []
+        my_class_children_classes = 0
+        my_class_children_classes_list = []
+        for python_file_obj in class_in_question.get_python_file_obj().get_project_obj().get_files():
+            for class_obj in python_file_obj.get_file_classes():
+                all_parent_classes = all_parent_classes + HierarchyNodeVisitor(class_obj).visit_ClassDef(class_obj.get_class_ast_node())
+        for my_class in all_parent_classes:
+            if (my_class == class_in_question.get_class_name()):
+                my_class_children_classes = my_class_children_classes + 1
+                my_class_children_classes_list.append(my_class)
+        return my_class_children_classes_list
 
-    def convertToActualParentObjects(self, classInQuestion, myParentClassesNamesOnly):
-        myParentClassesObjects = []
-        for pythonFile in classInQuestion.getPyFileObj().getProject().get_files():
-            for classObj in pythonFile.getFileClasses():
-                for classNameOnly in myParentClassesNamesOnly:
-                    if (classObj.name == classNameOnly):
-                        myParentClassesObjects.append(classObj)
-        return myParentClassesObjects
+    def convert_to_actual_parent_objects(self, class_in_question, my_parent_classes_names_only):
+        my_parent_classes_objects = []
+        for python_file_obj in class_in_question.get_python_file_obj().get_project_obj().get_files():
+            for class_obj in python_file_obj.get_file_classes():
+                for class_name_only in my_parent_classes_names_only:
+                    if (class_obj.get_class_name() == class_name_only):
+                        my_parent_classes_objects.append(class_obj)
+        return my_parent_classes_objects
 
-    def returnMaxParentDepth(self, myParentClassesObjects):
-        maxParentDIT = -2
-        for aParentClassObject in myParentClassesObjects:
-            if (aParentClassObject.get_hierarchy() == -1):
-                self.calcDIT(aParentClassObject)
+    def return_max_parent_depth(self, my_parent_classes_objects):
+        max_parent_dit = -2
+        for a_parent_class_object in my_parent_classes_objects:
+            if (a_parent_class_object.get_hierarchy() == -1):
+                self.calc_dit(a_parent_class_object)
             else:
-                if (aParentClassObject.get_hierarchy() > maxParentDIT):
-                    maxParentDIT = aParentClassObject.get_hierarchy()
-        return maxParentDIT
+                if (a_parent_class_object.get_hierarchy() > max_parent_dit):
+                    max_parent_dit = a_parent_class_object.get_hierarchy()
+        return max_parent_dit

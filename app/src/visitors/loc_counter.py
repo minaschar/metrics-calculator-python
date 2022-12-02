@@ -1,30 +1,30 @@
 import ast
 
 
-class LOC_Visitor(ast.NodeVisitor):
+class LOCNodeVisitor(ast.NodeVisitor):
 
-    def __init__(self, classObj):
-        self.classObj = classObj
-        self.loc = 0
+    def __init__(self, class_obj):
+        self.class_obj = class_obj
+        self.lines_of_code = 0
 
     def visit_ClassDef(self, node):
-        file_fullpath = self.classObj.getPyFileObj().get_fullpath()
+        file_full_path = self.class_obj.get_python_file_obj().get_file_full_path()
 
-        self.loc += (node.end_lineno - node.lineno + 1)
-        self.loc -= self.removeEmptyLines(file_fullpath, node.lineno, node.end_lineno)
+        self.lines_of_code += (node.end_lineno - node.lineno + 1)
+        self.lines_of_code -= self.remove_empty_lines(file_full_path, node.lineno, node.end_lineno)
 
-        return self.loc
+        return self.lines_of_code
 
-    def removeEmptyLines(self, file, classStart, classEnd):
-        lineCount = 0
-        emptyLines = 0
+    def remove_empty_lines(self, file_full_path, class_start_line, class_last_line):
+        line_count = 0
+        empty_lines = 0
 
-        with open(file, "r", encoding='utf-8') as file:
+        with open(file_full_path, "r", encoding='utf-8') as file:
             lines = file.readlines()
             for line in lines:
-                lineCount += 1
-                if (lineCount >= classStart and lineCount <= classEnd):
+                line_count += 1
+                if (line_count >= class_start_line and line_count <= class_last_line):
                     if (len(line.strip()) == 0):
-                        emptyLines += 1
+                        empty_lines += 1
 
-        return emptyLines
+        return empty_lines

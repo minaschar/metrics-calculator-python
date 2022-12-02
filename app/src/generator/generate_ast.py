@@ -1,19 +1,18 @@
 import ast
 import os
-from src.entities.project import Project
-from src.entities.python_file import Python_File
+from src.entities.python_file import PythonFile
 
 
-class ASTGenerator:
+class AstGenerator:
 
-    def __init__(self, project):
-        self.project = project
+    def __init__(self, project_obj):
+        self.project_obj = project_obj
 
     def start_parsing(self):
-        self.readFolder()
+        self.read_root_project_folder()
 
-    def readFolder(self):
-        for root, dirs, files in os.walk(self.project.get_root_folder_path()):
+    def read_root_project_folder(self):
+        for root, dirs, files in os.walk(self.project_obj.get_root_folder_path()):
             for file in files:  # Traverse all the directories
                 if file.endswith(".py"):  # we want only .py files
                     full_file_path = os.path.join(root, file)
@@ -23,16 +22,15 @@ class ASTGenerator:
                     python_file = open(full_file_path, "r", encoding='UTF8')
                     data_from_python_file_str = python_file.read()  # read whole file to a string
                     python_file.close()
-                    # This is not inside a try except since the Try except is moved inside the createAST method
-                    self.createAST(data_from_python_file_str, file, full_file_path)
+                    self.create_ast(data_from_python_file_str, file, full_file_path)
 
-    def createAST(self, python_file_str, file, full_file_path):
-        python_file = None
+    def create_ast(self, python_file_str, file, full_file_path):
+        python_file_obj = None
         try:
-            tree = ast.parse(python_file_str, filename=file, mode='exec', type_comments=False, feature_version=None)
-            python_file = Python_File(self.project, file, full_file_path, tree)
+            generated_ast_tree = ast.parse(python_file_str, filename=file, mode='exec', type_comments=False, feature_version=None)
+            python_file_obj = PythonFile(self.project_obj, file, full_file_path, generated_ast_tree)
         except SyntaxError:
             # Here we can first convert code from python 2.0 to python 3.0
             print("not parsed")
-        if python_file != None:
-            self.project.add_python_file(python_file)
+        if python_file_obj != None:
+            self.project_obj.add_python_file(python_file_obj)
