@@ -91,28 +91,34 @@ class MetricsCalculator:
         remote_methods_sum = len(set(MethodsCalledNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())))
         self.class_obj.get_complexity_category_metrics().set_rfc(self.class_obj.get_size_category_metrics().get_nom() + remote_methods_sum)
 
-    # Calculate NOCC Metric
+    # Calculate NOCC Metric, by the sum of a Classes' children
     def calc_nocc(self):
         my_class_children_classes = len(self.return_children(self.class_obj))
         self.class_obj.get_size_category_metrics().set_nocc(my_class_children_classes)
 
-    # Calculate DIT Metric
+    # Calculate DIT Metric, by the depth of the class in the max inheritance hierarchy
     def calc_dit(self, a_parent_class_object):
         self.curr_dit_class = a_parent_class_object
         # Class is not in any hierarchy
         if ((HierarchyNodeVisitor(self.curr_dit_class).visit_ClassDef(self.curr_dit_class.get_class_ast_node()) == []) and (len(self.return_children(self.curr_dit_class)) == 0)):
             self.curr_dit_class.get_complexity_category_metrics().set_dit(0)
+            # set_hierarchy is needed for the calculation of potential children classes' DIT since their DIT is -> MaxParentDIT + 1
             self.curr_dit_class.set_hierarchy(0)
+        # Class is in the root of an inheritance hierarchy
         elif ((HierarchyNodeVisitor(self.curr_dit_class).visit_ClassDef(self.curr_dit_class.get_class_ast_node()) == []) and (len(self.return_children(self.curr_dit_class)) != 0)):
             self.curr_dit_class.get_complexity_category_metrics().set_dit(1)
+            # set_hierarchy is needed for the calculation of potential children classes' DIT since their DIT is -> MaxParentDIT + 1
             self.curr_dit_class.set_hierarchy(1)
+        # Class is part of an inheritance hierarchy (not the root)
         else:
             my_parent_classes_names_only = HierarchyNodeVisitor(self.curr_dit_class).visit_ClassDef(self.curr_dit_class.get_class_ast_node())
 
-            # Converting simple name pointers to actually object classes
+            # Converting simple name pointers to actual object classes
             my_parent_classes_objects = self.convert_to_actual_parent_objects(self.curr_dit_class, my_parent_classes_names_only)
+            # Finding the max depth of the parent classes since DIT takes into concideration the max parent class depth as input
             max_parent_depth = self.return_max_parent_depth(my_parent_classes_objects)
             self.curr_dit_class.get_complexity_category_metrics().set_dit(max_parent_depth + 1)
+            # set_hierarchy is needed for the calculation of potential children classes' DIT since their DIT is -> MaxParentDIT + 1
             self.curr_dit_class.set_hierarchy(max_parent_depth + 1)
 
     # Calculate LOC metric, by counting lines of code for each class. Empty lines not added
@@ -157,22 +163,28 @@ class MetricsCalculator:
 
 ##################### Methods necessary for NOCC and DIT calculation #####################
 
+    # This method recieves a class and returns a list of its children (Classes in the list are presented by their names and not the actual objects)
 
     def return_children(self, class_in_question):
         all_parent_classes = list()
         my_class_children_classes = 0
         my_class_children_classes_list = list()
+        # Iterating through each class in each file in the project to define all classes that parent some class
         for python_file_obj in class_in_question.get_python_file_obj().get_project_obj().get_files():
             for class_obj in python_file_obj.get_file_classes():
                 all_parent_classes = all_parent_classes + HierarchyNodeVisitor(class_obj).visit_ClassDef(class_obj.get_class_ast_node())
+        # We search the "class_in_question" as a parent in the list collected from above.
+        # The amount of times the condition is met means how many classes the "class_in_question" fathers other classes and therefore "my_class_children_classes" is incremented.
         for my_class in all_parent_classes:
             if (my_class == class_in_question.get_class_name()):
                 my_class_children_classes = my_class_children_classes + 1
                 my_class_children_classes_list.append(my_class)
         return my_class_children_classes_list
 
+    # This method converts a list of parent classes presented in simple name strings into the actual object classes
     def convert_to_actual_parent_objects(self, class_in_question, my_parent_classes_names_only):
         my_parent_classes_objects = list()
+        # Iterating through each class in each file in the project
         for python_file_obj in class_in_question.get_python_file_obj().get_project_obj().get_files():
             for class_obj in python_file_obj.get_file_classes():
                 for class_name_only in my_parent_classes_names_only:
@@ -180,12 +192,17 @@ class MetricsCalculator:
                         my_parent_classes_objects.append(class_obj)
         return my_parent_classes_objects
 
+    # This method returns the max depth of a given parent class object
     def return_max_parent_depth(self, my_parent_classes_objects):
+        # "max_parent_dit" is initialized to -2 because the default value of classObj.hierarchy is -1 and is set by the constructor
         max_parent_dit = -2
         for a_parent_class_object in my_parent_classes_objects:
+            # This if clause makes sure that a parent has also calculated its DIT so that the children classes' DIT is -> MaxParentDIT + 1
             if (a_parent_class_object.get_hierarchy() == -1):
+                # Recursion
                 self.calc_dit(a_parent_class_object)
             else:
                 if (a_parent_class_object.get_hierarchy() > max_parent_dit):
+                    # Condition is met and the max value changes
                     max_parent_dit = a_parent_class_object.get_hierarchy()
         return max_parent_dit
