@@ -126,12 +126,13 @@ class MetricsCalculator:
 
         self.class_obj.get_coupling_category_metrics().set_mpc(messages)
 
-    # Calculate CBO Metric. As coupling between classes we consider the heredity and the message passing between the classes
+    # Calculate CBO Metric. As coupling between classes we consider the inheritance and the message passing between the classes
     # Classes in libraries not inluded in the calculation
     def calc_cbo(self):
         # We store all the methods that called, and belongs to other classes. Methods from libraries are not included
         methods_that_called = MethodsCalledNodeVisitor(self.class_obj).visit_ClassDef(self.class_obj.get_class_ast_node())
         # We store all the class name or instance names that used to call methods from other classes in the project. Classes and methods from libraries are not included
+        # We use a set because we count each class and each instance only one time
         class_uses = set()
         for method in methods_that_called:
             parts = method.split(".", 2)
