@@ -11,6 +11,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from src.metrics.calculator.metrics_calculator import MetricsCalculator
 from gui.metricsManualWindow import Ui_Dialog
+import pandas as pd
+from os import walk
 # import main window
 # from mainWindow import Ui_MainWindow
 
@@ -150,6 +152,7 @@ class Ui_metricsWindow(object):
         # set click listeners
         self.backMainBtn.clicked.connect(self.backToMain)
         self.helpBtn_2.clicked.connect(self.openManual)
+        self.exportExcelBtn.clicked.connect(self.exportToExcel)
 
         self.retranslateUi(metricsWindow)
         QtCore.QMetaObject.connectSlotsByName(metricsWindow)
@@ -209,6 +212,37 @@ class Ui_metricsWindow(object):
         self.ui.setupUi(self.manualWindow, self.window)
         self.manualWindow.show()
         self.window.close()
+
+    def exportToExcel(self):
+
+        folder_name = QtWidgets.QFileDialog.getExistingDirectory()
+
+        if (folder_name):
+
+            rowCount = self.metricsTbl.rowCount()
+            columnCount = 13
+
+            data = []
+
+            for row in range(rowCount):
+                rowData = []
+                for column in range(columnCount):
+                    widgetItem = self.metricsTbl.item(row, column)
+                    if widgetItem and widgetItem.text:
+                        rowData.append(widgetItem.text())
+                    else:
+                        rowData.append('NULL')
+
+                data.append(rowData)
+
+            df = pd.DataFrame(data)
+            header = df.iloc[0]
+            df = df[1:]
+            df.columns = header
+
+        for root, dirs, files in os.walk(self.project_obj.get_root_folder_path()):
+            for file in files:  
+            # df.to_excel(folder_name + "\metrics_results.xlsx" + , header=True, index=False)
 
 
 if __name__ == "__main__":
