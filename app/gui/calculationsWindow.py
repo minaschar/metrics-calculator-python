@@ -247,7 +247,7 @@ class Ui_metricsWindow(object):
 
             # Success message after saving
             msg_popup = QMessageBox()
-            msg_popup.setText(f"Successfully saved to {output_filename}")
+            msg_popup.setText(f"Successfully saved {folder_name}/{output_filename}")
             msg_popup.setIcon(QMessageBox.Information)
             msg_popup.setStandardButtons(QMessageBox.Close)
             msg_popup.exec_()
