@@ -10,6 +10,7 @@
 import pandas as pd
 import time
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from src.metrics.calculator.metrics_calculator import MetricsCalculator
 from gui.metricsManualWindow import Ui_Dialog
 # import main window
@@ -243,6 +244,13 @@ class Ui_metricsWindow(object):
             output_filename = self.project_obj.get_project_name() + "_results-" + str(int(time.time())) + ".xlsx"
 
             df.to_excel(folder_name + "\\" + output_filename, header=True, index=False)
+
+            # Success message after saving
+            msg_popup = QMessageBox()
+            msg_popup.setText(f"Successfully saved to {output_filename}")
+            msg_popup.setIcon(QMessageBox.Information)
+            msg_popup.setStandardButtons(QMessageBox.Close)
+            msg_popup.exec_()
 
 
 if __name__ == "__main__":
