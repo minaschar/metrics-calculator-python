@@ -1,0 +1,42 @@
+{
+  "files": [
+    {
+      "classes": [
+        {
+          "cbo": 0,
+          "class_name": "Inner",
+          "dit": 0,
+          "hierarchy": 0,
+          "lcom": 0,
+          "loc": 3,
+          "mpc": 0,
+          "nocc": 0,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 1,
+          "wac": 0,
+          "wmpc1": 1.0,
+          "wmpc2": 2
+        },
+        {
+          "cbo": 0,
+          "class_name": "Outer",
+          "dit": 0,
+          "hierarchy": 0,
+          "lcom": 0,
+          "loc": 6,
+          "mpc": 0,
+          "nocc": 0,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 1,
+          "wac": 0,
+          "wmpc1": 1.0,
+          "wmpc2": 2
+        }
+      ],
+      "file_name": "module_a.py"
+    }
+  ],
+  "noc": 2
+}

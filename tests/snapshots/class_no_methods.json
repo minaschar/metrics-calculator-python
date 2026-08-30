@@ -1,0 +1,26 @@
+{
+  "files": [
+    {
+      "classes": [
+        {
+          "cbo": 0,
+          "class_name": "DataOnly",
+          "dit": 0,
+          "hierarchy": 0,
+          "lcom": 0,
+          "loc": 3,
+          "mpc": 0,
+          "nocc": 0,
+          "nom": 0,
+          "rfc": 0,
+          "size2": 2,
+          "wac": 2,
+          "wmpc1": 0.0,
+          "wmpc2": 0
+        }
+      ],
+      "file_name": "module_a.py"
+    }
+  ],
+  "noc": 1
+}

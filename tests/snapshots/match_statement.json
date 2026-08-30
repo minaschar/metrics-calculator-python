@@ -1,0 +1,26 @@
+{
+  "files": [
+    {
+      "classes": [
+        {
+          "cbo": 0,
+          "class_name": "Router",
+          "dit": 0,
+          "hierarchy": 0,
+          "lcom": 0,
+          "loc": 9,
+          "mpc": 0,
+          "nocc": 0,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 1,
+          "wac": 0,
+          "wmpc1": 4.0,
+          "wmpc2": 3
+        }
+      ],
+      "file_name": "module_a.py"
+    }
+  ],
+  "noc": 1
+}

@@ -1,0 +1,3 @@
+class DataOnly:
+    x = 1
+    y = 2
