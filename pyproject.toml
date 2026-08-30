@@ -1,0 +1,81 @@
+[project]
+name = "metrics-calculator-python"
+version = "0.1.0"
+description = "Object-oriented software quality metrics calculator for Python codebases (AST-based)."
+readme = "README.md"
+license = "EPL-2.0"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "pyqt5>=5.15.9",
+    "pandas>=2.1",
+    "openpyxl>=3.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+    "mypy>=1.10",
+    "pre-commit>=3.7",
+]
+
+# The `app/` tree is legacy code slated for a full rewrite in Phase 1 of the
+# modernization effort; it is not (yet) an installable package. uv is used
+# here purely as an environment/dependency manager until then.
+[tool.uv]
+package = false
+# PyQt5-Qt5 (the bundled Qt binaries) stopped publishing Windows wheels after
+# 5.15.2 -- every later release on PyPI is Linux/macOS only. 5.15.2 is the
+# newest version with wheels for all platforms we target, so it's pinned
+# here rather than left to float. Revisit when Phase 3 evaluates PySide6.
+constraint-dependencies = ["pyqt5-qt5==5.15.2"]
+
+[tool.pytest.ini_options]
+pythonpath = ["app"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# `app/` is pre-rewrite legacy code (Phase 1 replaces it outright); linting it
+# now would just be noise. Drop this exclusion once the new package lands.
+# `tests/fixtures` holds deliberately minimal (and in one case deliberately
+# invalid) sample source used as analysis input, not maintained code.
+extend-exclude = ["app", "tests/fixtures"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "RUF"]
+
+[tool.mypy]
+python_version = "3.11"
+# Scoped to the new regression-test harness only. `app/` is untyped legacy
+# code slated for a full rewrite (Phase 1), where it will gain full type
+# hints and come under strict mypy checking. Widening this now would mean
+# either suppressing hundreds of pre-existing errors or fixing legacy code
+# out of phase order.
+mypy_path = ["app"]
+files = ["tests"]
+exclude = ["tests/fixtures"]
+strict = true
+# The harness necessarily calls into `app/`'s pre-rewrite engine, which has
+# no type hints at all. Without this, strict mode's disallow_untyped_calls
+# flags every such call. Drop once Phase 1 adds real type hints there.
+disallow_untyped_calls = false
+
+[[tool.mypy.overrides]]
+# `app/src` is pre-rewrite legacy code with no type hints (Phase 1 rewrites
+# it under full strict typing). mypy still follows it from the harness for
+# inference, but its own internal errors aren't ours to fix out of phase
+# order, so they're suppressed here rather than widening `files` to cover
+# `app/`.
+module = "src.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+# pytest's assertion rewriter optionally imports numpy for array-diffing;
+# mypy follows that import even though nothing in this project uses numpy
+# directly, and numpy's bundled stubs require Python >= 3.12 syntax. Skip
+# rather than parse them.
+module = ["numpy", "numpy.*"]
+follow_imports = "skip"
+follow_imports_for_stubs = true
