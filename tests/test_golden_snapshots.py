@@ -19,15 +19,10 @@ from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
 
 import pytest
 from _analysis_harness import analyze_fixture
-
-FIXTURES_DIR = Path(__file__).parent / "fixtures"
-SNAPSHOTS_DIR = Path(__file__).parent / "snapshots"
-
-FIXTURE_NAMES = sorted(p.name for p in FIXTURES_DIR.iterdir() if p.is_dir())
+from _paths import FIXTURE_NAMES, FIXTURES_DIR, SNAPSHOTS_DIR
 
 
 @pytest.mark.parametrize("fixture_name", FIXTURE_NAMES)
