@@ -59,7 +59,7 @@ class HistogramWidget(QWidget):
 
         painter.fillRect(self.rect(), QColor(pal.surface))
 
-        margin_left, margin_right = 44, 16
+        margin_left, margin_right = 44, 40
         margin_top, margin_bottom = 28, 34
         plot = QRectF(
             margin_left,
