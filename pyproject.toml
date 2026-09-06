@@ -9,14 +9,17 @@ description = "Object-oriented software quality metrics calculator for Python co
 readme = "README.md"
 license = "EPL-2.0"
 requires-python = ">=3.11,<3.14"
-# The core engine (src/metrics_calculator) has zero runtime dependencies
-# beyond the standard library -- it imports no UI code and needs no data
-# libraries. PyQt5/pandas/openpyxl belong to the legacy app/ GUI, kept in
-# the dev group below only until Phase 3/4 retire it.
+# The core engine (src/metrics_calculator, excluding cli/) has zero
+# runtime dependencies beyond the standard library -- it imports no UI
+# code and needs no data libraries. The CLI is an optional extra so a
+# bare `pip install metrics-calculator-python` stays dependency-free.
 dependencies = []
 
+[project.optional-dependencies]
+cli = ["typer>=0.12", "rich>=13.7", "pandas>=2.1", "openpyxl>=3.1"]
+
 [project.scripts]
-metrics-calculator = "metrics_calculator.__main__:main"
+metrics-calculator = "metrics_calculator.cli.app:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/metrics_calculator"]
@@ -27,11 +30,14 @@ dev = [
     "ruff>=0.6",
     "mypy>=1.10",
     "pre-commit>=3.7",
-    # Needed to run the legacy app/ during the Phase 1-4 transition (the
-    # old GUI + Excel export). Remove once app/ is deleted.
+    "typer>=0.12",
+    "rich>=13.7",
+    # Also needed to run the legacy app/ during the Phase 1-4 transition
+    # (the old GUI + Excel export). Remove once app/ is deleted.
     "pyqt5>=5.15.9",
     "pandas>=2.1",
     "openpyxl>=3.1",
+    "pandas-stubs>=2.1",
 ]
 
 [tool.uv]
