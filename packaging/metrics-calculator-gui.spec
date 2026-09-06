@@ -1,5 +1,5 @@
 # PyInstaller spec for the desktop app. Build from the repo root with:
-#     pyinstaller packaging/metrics-calculator-gui.spec
+#     uv run pyinstaller --clean --noconfirm packaging/metrics-calculator-gui.spec
 #
 # Produces a single self-contained executable (MetricsCalculator[.exe]) in
 # dist/. PySide6's PyInstaller hook pulls in the Qt plugins we need
@@ -21,8 +21,6 @@ for _module in ("pandas", "openpyxl"):
         continue
     _optional_xlsx += collect_submodules(_module)
 
-block_cipher = None
-
 a = Analysis(
     [os.path.join(_here, "gui_entry.py")],
     pathex=[_src],
@@ -32,20 +30,16 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=["tkinter", "PySide6.QtWebEngineCore", "PySide6.Qt3DCore"],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
+    excludes=["tkinter"],
     noarchive=False,
 )
 
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
-    a.zipfiles,
     a.datas,
     [],
     name="MetricsCalculator",

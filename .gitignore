@@ -1,8 +1,27 @@
+# Python bytecode
 __pycache__/
+*.py[cod]
+
+# Virtualenvs
 .venv/
+venv/
+env/
+
+# Tool caches
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
+
+# Build / packaging output
 *.egg-info/
-dist/
 build/
+dist/
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.swp
+
+# OS cruft
+.DS_Store
+Thumbs.db

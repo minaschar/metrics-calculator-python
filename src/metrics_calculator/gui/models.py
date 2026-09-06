@@ -8,7 +8,7 @@ and "Save as..." all read the model, never the widget's cells.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from PySide6.QtCore import (
@@ -22,7 +22,7 @@ from PySide6.QtCore import (
 from PySide6.QtGui import QColor
 
 from ..registry import METRIC_REGISTRY, MetricDefinition
-from ..reporting import FIELDNAMES, Row
+from ..reporting import Row
 from ..results import ProjectMetrics
 from .stats import ColumnStats, summarise
 from .theme import Palette
@@ -245,7 +245,3 @@ class MetricsFilterProxyModel(QSortFilterProxyModel):
             source_row = self.mapToSource(self.index(proxy_row, 0)).row()
             rows.append(model.export_row(source_row))
         return rows
-
-
-def fieldnames() -> Sequence[str]:
-    return FIELDNAMES

@@ -21,16 +21,16 @@ from the Git repository.
 ### With `pipx` (recommended for the command-line / desktop tools)
 
 ```sh
-pipx install "metrics-calculator-python[cli] @ git+https://github.com/ics20072/metrics-calculator-python.git"
+pipx install "metrics-calculator-python[cli] @ git+https://github.com/minaschar/metrics-calculator-python.git"
 # for the desktop app instead:
-pipx install "metrics-calculator-python[cli,gui] @ git+https://github.com/ics20072/metrics-calculator-python.git"
+pipx install "metrics-calculator-python[cli,gui] @ git+https://github.com/minaschar/metrics-calculator-python.git"
 ```
 
 ### With `pip` into a virtualenv
 
 ```sh
 python -m venv .venv && . .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install "metrics-calculator-python[cli,gui] @ git+https://github.com/ics20072/metrics-calculator-python.git"
+pip install "metrics-calculator-python[cli,gui] @ git+https://github.com/minaschar/metrics-calculator-python.git"
 ```
 
 Extras: `cli` pulls in Typer/Rich/pandas/openpyxl for the command-line tool and
@@ -103,7 +103,7 @@ no UI code.
 ### Set up
 
 ```sh
-git clone https://github.com/ics20072/metrics-calculator-python.git
+git clone https://github.com/minaschar/metrics-calculator-python.git
 cd metrics-calculator-python
 uv sync --all-extras            # creates .venv with core + cli + gui + dev tools
 uv run pre-commit install       # optional: run the checks on every commit

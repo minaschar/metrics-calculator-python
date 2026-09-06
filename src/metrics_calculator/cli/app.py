@@ -140,7 +140,9 @@ def analyze_command(
         if output is not None:
             output.write_text(rendered, encoding="utf-8")
         else:
-            console.print(rendered, highlight=False, soft_wrap=True)
+            # markup=False: this is machine-readable output (json/csv/html);
+            # never let Rich interpret a bracketed substring as a style tag.
+            console.print(rendered, markup=False, highlight=False, soft_wrap=True)
 
     violations = check_thresholds(result, thresholds) if thresholds else []
     for violation in violations:
@@ -174,26 +176,25 @@ def diff_command(
     if output_format == "json":
         import json
 
-        console.print(
-            json.dumps(
-                {
-                    "added_classes": [list(k) for k in diff.added_classes],
-                    "removed_classes": [list(k) for k in diff.removed_classes],
-                    "changed": [
-                        {
-                            "file_name": c.file_name,
-                            "class_name": c.class_name,
-                            "metric": c.metric,
-                            "old": c.old,
-                            "new": c.new,
-                            "delta": c.delta,
-                        }
-                        for c in diff.changed
-                    ],
-                },
-                indent=2,
-            )
+        payload = json.dumps(
+            {
+                "added_classes": [list(k) for k in diff.added_classes],
+                "removed_classes": [list(k) for k in diff.removed_classes],
+                "changed": [
+                    {
+                        "file_name": c.file_name,
+                        "class_name": c.class_name,
+                        "metric": c.metric,
+                        "old": c.old,
+                        "new": c.new,
+                        "delta": c.delta,
+                    }
+                    for c in diff.changed
+                ],
+            },
+            indent=2,
         )
+        console.print(payload, markup=False, highlight=False, soft_wrap=True)
         raise typer.Exit(code=0 if diff.is_empty else 1)
 
     if diff.is_empty:
