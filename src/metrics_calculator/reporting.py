@@ -87,8 +87,13 @@ def rows_to_xlsx(rows: Sequence[Row], output_path: Path) -> None:
     frame.to_excel(output_path, index=False)
 
 
+# Bump when the JSON export shape changes in a way consumers must notice.
+JSON_SCHEMA_VERSION = 1
+
+
 def to_json(project_metrics: ProjectMetrics) -> str:
     payload = {
+        "schema_version": JSON_SCHEMA_VERSION,
         "project_name": project_metrics.project_name,
         "root_path": project_metrics.root_path,
         "noc": project_metrics.noc,
