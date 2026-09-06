@@ -1,7 +1,10 @@
 """Export a `ProjectMetrics` result to JSON, CSV, HTML or XLSX.
 
 Every format is driven by `METRIC_REGISTRY` for column headers and value
-lookup -- add a metric to the registry and every format picks it up.
+lookup -- add a metric to the registry and every format picks it up. Lives
+at package root (not under `cli/`) because the CLI and the desktop app are
+both consumers: the GUI's table model and its "Save as..." dialog reuse
+`to_rows` and the `to_*` writers rather than scraping widget cells.
 """
 
 from __future__ import annotations
@@ -12,8 +15,8 @@ import io
 import json
 from pathlib import Path
 
-from ..registry import METRIC_REGISTRY
-from ..results import ClassMetrics, ProjectMetrics
+from .registry import METRIC_REGISTRY
+from .results import ClassMetrics, ProjectMetrics
 
 _ROW_HEADER = ("file_name", "class_name")
 

@@ -15,7 +15,7 @@ from pathlib import Path
 from ..config import AnalysisConfig
 from ..engine import analyze
 from ..registry import METRIC_REGISTRY
-from .export import to_rows
+from ..reporting import to_rows
 
 ClassKey = tuple[str, str]  # (file_name, class_name)
 MetricRow = dict[str, float]

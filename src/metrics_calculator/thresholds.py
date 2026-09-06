@@ -1,5 +1,9 @@
-"""`--fail-under METRIC=VALUE` parsing and evaluation, so a CI job can gate
-on this tool's output instead of just reading it.
+"""Threshold parsing and evaluation.
+
+`parse_threshold_option` backs the CLI's `--fail-under METRIC=VALUE`; the
+desktop app's results view reuses `check_thresholds` (and the raw
+`thresholds` mapping) to colour cells that exceed their limit. Lives at
+package root so neither consumer owns it.
 """
 
 from __future__ import annotations
@@ -7,8 +11,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from ..registry import METRIC_REGISTRY
-from ..results import ProjectMetrics
+from .registry import METRIC_REGISTRY
+from .results import ProjectMetrics
 
 
 @dataclass(frozen=True, slots=True)

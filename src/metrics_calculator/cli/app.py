@@ -13,9 +13,9 @@ from rich.table import Table
 from ..config import AnalysisConfig
 from ..engine import analyze
 from ..registry import METRIC_REGISTRY
+from ..reporting import to_csv, to_html, to_json, to_rows, to_xlsx
+from ..thresholds import check_thresholds, parse_threshold_option
 from .diff import diff_metric_rows, load_metric_rows
-from .export import to_csv, to_html, to_json, to_rows, to_xlsx
-from .thresholds import check_thresholds, parse_threshold_option
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 console = Console()
