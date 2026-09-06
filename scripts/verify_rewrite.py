@@ -28,7 +28,7 @@ sys.path.insert(0, str(_ROOT / "app"))  # legacy engine imports `src.*` from app
 sys.path.insert(0, str(_ROOT / "tests"))  # the two analyze_fixture harnesses
 
 from _analysis_harness import analyze_fixture as legacy_analyze  # noqa: E402
-from _new_engine_harness import analyze_fixture as new_analyze  # noqa: E402
+from _engine_snapshot import analyze_fixture as new_analyze  # noqa: E402
 
 
 def _flatten(payload: dict[str, Any]) -> dict[tuple[str, str, str], object]:

@@ -5,8 +5,7 @@
         {
           "cbo": 2,
           "class_name": "Duck",
-          "dit": 2,
-          "hierarchy": 2,
+          "dit": 1,
           "lcom": 0,
           "loc": 3,
           "mpc": 0,
@@ -21,8 +20,7 @@
         {
           "cbo": 1,
           "class_name": "Flyer",
-          "dit": 1,
-          "hierarchy": 1,
+          "dit": 0,
           "lcom": 0,
           "loc": 3,
           "mpc": 0,
@@ -37,8 +35,7 @@
         {
           "cbo": 1,
           "class_name": "Swimmer",
-          "dit": 1,
-          "hierarchy": 1,
+          "dit": 0,
           "lcom": 0,
           "loc": 3,
           "mpc": 0,

@@ -5,43 +5,44 @@ from __future__ import annotations
 import ast
 from collections.abc import Mapping
 
+_FUNC_DEFS = (ast.FunctionDef, ast.AsyncFunctionDef)
+_NESTED_SCOPES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
 
-class _FieldUseVisitor(ast.NodeVisitor):
-    """Mirrors the original LCOMNodeVisitor, including its known scoping
-    defect: a single accumulator set is shared and merely cleared between
-    methods, so attribute uses inside a nested function or nested class
-    leak into the enclosing method's usage set (see project brief Phase 5,
-    item 6). Fixing that is out of scope until Phase 5.
+
+def _method_field_uses(
+    node: ast.FunctionDef | ast.AsyncFunctionDef, known: frozenset[str]
+) -> frozenset[str]:
+    """Fields (`self.x`, `Klass.x`) touched directly in this method's
+    body.
+
+    Phase 5, items 5-6: `async def` methods are handled, and the walk
+    stops at any nested function or class -- their attribute uses belong
+    to their own scope, not this method's cohesion (the original shared
+    one accumulator across methods and merely cleared it, letting nested
+    scopes leak).
     """
-
-    def __init__(self, known_fields: frozenset[str]) -> None:
-        self._known_fields = known_fields
-        self._current: set[str] = set()
-        self.uses_by_method: dict[str, frozenset[str]] = {}
-
-    def visit_ClassDef(self, node: ast.ClassDef) -> None:
-        for child in node.body:
-            if isinstance(child, ast.FunctionDef):
-                self.visit_FunctionDef(child)
-
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        self.generic_visit(node)
-        self.uses_by_method[node.name] = frozenset(self._current)
-        self._current.clear()
-
-    def visit_Attribute(self, node: ast.Attribute) -> None:
-        if isinstance(node.value, ast.Name):
-            attr = f"{node.value.id}.{node.attr}"
-            if attr in self._known_fields:
-                self._current.add(attr)
+    used: set[str] = set()
+    stack: list[ast.AST] = list(ast.iter_child_nodes(node))
+    while stack:
+        current = stack.pop()
+        if isinstance(current, _NESTED_SCOPES):
+            continue
+        if isinstance(current, ast.Attribute) and isinstance(current.value, ast.Name):
+            attr = f"{current.value.id}.{current.attr}"
+            if attr in known:
+                used.add(attr)
+        stack.extend(ast.iter_child_nodes(current))
+    return frozenset(used)
 
 
 def field_uses_by_method(
     node: ast.ClassDef, known_fields: frozenset[str]
 ) -> dict[str, frozenset[str]]:
-    visitor = _FieldUseVisitor(known_fields)
-    visitor.visit_ClassDef(node)
-    return visitor.uses_by_method
+    return {
+        child.name: _method_field_uses(child, known_fields)
+        for child in node.body
+        if isinstance(child, _FUNC_DEFS)
+    }
 
 
 def lack_of_cohesion(uses_by_method: Mapping[str, frozenset[str]]) -> int:

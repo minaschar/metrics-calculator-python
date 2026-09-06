@@ -22,16 +22,6 @@ class ComplexityMetrics:
     wmpc1: float = 0.0
     wmpc2: int = 0
     rfc: int = 0
-    # Internal DIT-computation state carried over verbatim from the
-    # original tool, where `hierarchy` and `dit` were stored separately and
-    # usually -- but not always -- held the same number: when the original's
-    # `calc_dit` misdirects its write onto an ancestor (project brief Phase
-    # 5, item 1), the class keeps `hierarchy = -1` (its instance default)
-    # while `dit` keeps `0` (a class-attribute default). Not a published
-    # metric, not in the registry, not exported; kept only so the
-    # golden-snapshot check stays exact through Phase 4. Phase 5 collapses
-    # this back into `dit`.
-    hierarchy: int = -1
 
 
 @dataclass(slots=True)
@@ -45,21 +35,12 @@ class CohesionMetrics:
     lcom: int = 0
 
 
-@dataclass(slots=True)
-class QmoodMetrics:
-    """Bansiya & Davis (2002) design-quality attributes.
-
-    Declared for API completeness but never computed -- carried over
-    unimplemented from the original tool pending a Phase 5 decision on
-    whether to implement them properly or drop them (see project brief).
-    """
-
-    reusability: float = 0.0
-    flexibility: float = 0.0
-    understandability: float = 0.0
-    functionality: float = 0.0
-    extendability: float = 0.0
-    effectiveness: float = 0.0
+# Phase 5, item 10: the original declared a QMOOD category with six
+# Bansiya & Davis (2002) design attributes (reusability, flexibility,
+# understandability, functionality, extendability, effectiveness) that
+# nothing ever computed -- always 0.0, never displayed. They are dropped
+# here rather than carried as dead fields; implementing QMOOD properly is
+# recorded as future work (see the roadmap / CHANGELOG).
 
 
 @dataclass(slots=True)
@@ -70,7 +51,6 @@ class ClassMetrics:
     complexity: ComplexityMetrics = field(default_factory=ComplexityMetrics)
     coupling: CouplingMetrics = field(default_factory=CouplingMetrics)
     cohesion: CohesionMetrics = field(default_factory=CohesionMetrics)
-    qmood: QmoodMetrics = field(default_factory=QmoodMetrics)
 
 
 @dataclass(slots=True)

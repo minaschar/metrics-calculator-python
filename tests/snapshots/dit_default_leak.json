@@ -5,8 +5,7 @@
         {
           "cbo": 1,
           "class_name": "Leaf",
-          "dit": 0,
-          "hierarchy": -1,
+          "dit": 1,
           "lcom": 0,
           "loc": 3,
           "mpc": 0,
@@ -21,8 +20,7 @@
         {
           "cbo": 1,
           "class_name": "Root",
-          "dit": 1,
-          "hierarchy": 1,
+          "dit": 0,
           "lcom": 0,
           "loc": 3,
           "mpc": 0,

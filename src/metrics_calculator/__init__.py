@@ -26,7 +26,6 @@ from .results import (
     CouplingMetrics,
     FileMetrics,
     ProjectMetrics,
-    QmoodMetrics,
     SizeMetrics,
 )
 
@@ -50,7 +49,6 @@ __all__ = [
     "MetricDefinition",
     "ProjectMetricDefinition",
     "ProjectMetrics",
-    "QmoodMetrics",
     "SizeMetrics",
     "__version__",
     "analyze",

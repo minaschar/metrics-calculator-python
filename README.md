@@ -15,3 +15,12 @@ uv run mypy          # type-check
 
 A full README rewrite (install instructions, CLI usage, limitations) is planned once the
 modernization effort lands the new package and CLI.
+
+## Not implemented (future work)
+
+- **QMOOD design-quality attributes** (Bansiya & Davis 2002: reusability, flexibility,
+  understandability, functionality, extendability, effectiveness). The original tool declared
+  these but never computed them; they were removed rather than kept as always-zero fields.
+- **Technical-debt scoring.** Despite an earlier project description, no technical-debt model
+  has ever existed in this codebase. (The GitHub repository description should be updated to
+  drop that claim.)

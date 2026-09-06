@@ -3,23 +3,28 @@
     {
       "classes": [
         {
-          "cbo": 0,
-          "class_name": "Cache",
+          "cbo": 1,
+          "class_name": "Client",
           "dit": 0,
           "lcom": 0,
-          "loc": 3,
-          "mpc": 0,
+          "loc": 4,
+          "mpc": 2,
           "nocc": 0,
           "nom": 1,
-          "rfc": 1,
-          "size2": 3,
-          "wac": 2,
+          "rfc": 2,
+          "size2": 1,
+          "wac": 0,
           "wmpc1": 1.0,
-          "wmpc2": 3
-        },
+          "wmpc2": 4
+        }
+      ],
+      "file_name": "client.py"
+    },
+    {
+      "classes": [
         {
           "cbo": 0,
-          "class_name": "Cache",
+          "class_name": "DiskStore",
           "dit": 0,
           "lcom": 0,
           "loc": 3,
@@ -30,25 +35,30 @@
           "size2": 1,
           "wac": 0,
           "wmpc1": 1.0,
-          "wmpc2": 3
-        },
-        {
-          "cbo": 0,
-          "class_name": "Outer",
-          "dit": 0,
-          "lcom": 0,
-          "loc": 8,
-          "mpc": 0,
-          "nocc": 0,
-          "nom": 1,
-          "rfc": 1,
-          "size2": 1,
-          "wac": 0,
-          "wmpc1": 2.0,
           "wmpc2": 3
         }
       ],
-      "file_name": "module_a.py"
+      "file_name": "store_a.py"
+    },
+    {
+      "classes": [
+        {
+          "cbo": 0,
+          "class_name": "MemoryStore",
+          "dit": 0,
+          "lcom": 0,
+          "loc": 3,
+          "mpc": 0,
+          "nocc": 0,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 1,
+          "wac": 0,
+          "wmpc1": 1.0,
+          "wmpc2": 3
+        }
+      ],
+      "file_name": "store_b.py"
     }
   ],
   "noc": 3

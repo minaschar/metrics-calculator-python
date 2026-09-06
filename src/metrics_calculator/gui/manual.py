@@ -9,11 +9,21 @@ to the manual with no further work. Qt-free so it can be tested directly.
 
 from __future__ import annotations
 
-import dataclasses
 from dataclasses import dataclass
 
 from ..registry import METRIC_REGISTRY, PROJECT_METRIC_REGISTRY
-from ..results import QmoodMetrics
+
+# Bansiya & Davis (2002) QMOOD design-quality attributes. Not computed by
+# this tool (Phase 5, item 10 -- the original declared them but never
+# implemented them); listed in the manual as future work.
+_QMOOD_ATTRIBUTES: tuple[str, ...] = (
+    "reusability",
+    "flexibility",
+    "understandability",
+    "functionality",
+    "extendability",
+    "effectiveness",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,15 +51,15 @@ def manual_entries() -> list[ManualEntry]:
     # than dropping them silently.
     entries += [
         ManualEntry(
-            field.name,
-            field.name.replace("_", " ").title(),
+            name,
+            name.replace("_", " ").title(),
             "qmood",
-            "Bansiya & Davis design-quality attribute. Declared for API "
-            "completeness but not yet computed by this tool.",
+            "Bansiya & Davis design-quality attribute. Not computed by this "
+            "tool; recorded as future work.",
             "Bansiya & Davis (2002)",
             computed=False,
         )
-        for field in dataclasses.fields(QmoodMetrics)
+        for name in _QMOOD_ATTRIBUTES
     ]
     return entries
 

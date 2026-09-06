@@ -2,24 +2,23 @@
 fields and declared base names. This is the "first pass" the rest of the
 engine builds on -- it does not compute any metric itself.
 
-This is a faithful port of the original tool's ``InitCommonsNodeVisitor``
-(plus ``ClassAttrNodeVisitor``). Its quirks are deliberately preserved so
-the metric numbers do not move before Phase 5:
+Structurally this follows the original tool's ``InitCommonsNodeVisitor``
+(plus ``ClassAttrNodeVisitor``), including two quirks that are kept until
+they get their own Phase 5 fix:
 
 - ``def``s nested inside a method body are collected as methods of the
   enclosing class (the original's ``visit_FunctionDef`` calls
-  ``generic_visit``, which re-dispatches ``visit_FunctionDef`` on every
-  nested function). This inflates NOM and everything derived from it.
+  ``generic_visit``, which re-dispatches on every nested function).
 - a ``class`` nested inside a *method* body is processed twice -- once
   while descending that method, once by the module-level ``ast.walk`` --
-  and, while it is being processed, ``curr_class`` is repointed at it and
-  never restored, so later attribute writes in that method land on the
-  nested class.
-- only positional args are counted per method; ``async def`` is ignored;
-  only ``ast.Name`` bases are recognised; only plain ``ast.Assign``
-  targets are seen as fields.
+  and while it is processed ``curr_class`` is repointed at it and never
+  restored, so later attribute writes in that method land on the nested
+  class.
 
-See project brief Phase 5, items 5-7 and 9.
+Phase 5 fixes already applied here: ``async def`` methods are recognised
+(item 5); ``x: int = 0`` / ``x += 1`` class attributes are seen (item 7);
+dotted bases ``class Foo(pkg.Base)`` are recorded as ``Base`` (item 9).
+Only positional args are counted per method.
 """
 
 from __future__ import annotations
@@ -27,6 +26,9 @@ from __future__ import annotations
 import ast
 from dataclasses import dataclass, field
 from pathlib import Path
+
+_FUNC_DEFS = (ast.FunctionDef, ast.AsyncFunctionDef)
+_FuncDef = ast.FunctionDef | ast.AsyncFunctionDef
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,10 +56,17 @@ class FileFacts:
 
 
 def _base_names(node: ast.ClassDef) -> tuple[str, ...]:
-    # Only simple names (`class Foo(Base):`) are recognised. Dotted bases
-    # (`class Foo(module.Base):`) are invisible to this tool -- see project
-    # brief Phase 5, item 9; preserved here rather than fixed early.
-    return tuple(base.id for base in node.bases if isinstance(base, ast.Name))
+    # `class Foo(Base)` -> "Base"; `class Foo(pkg.mod.Base)` -> "Base"
+    # (Phase 5, item 9 -- the dotted-base case the original left
+    # commented out). Anything more exotic (a subscript, a call) is
+    # skipped.
+    names: list[str] = []
+    for base in node.bases:
+        if isinstance(base, ast.Name):
+            names.append(base.id)
+        elif isinstance(base, ast.Attribute):
+            names.append(base.attr)
+    return tuple(names)
 
 
 class _ClassLevelFieldCollector(ast.NodeVisitor):
@@ -102,18 +111,26 @@ class _StructureVisitor(ast.NodeVisitor):
         self.classes.append(facts)
         class_level = _ClassLevelFieldCollector(node.name, facts.fields)
         for child in node.body:
-            if isinstance(child, ast.FunctionDef):
-                self.visit_FunctionDef(child)
-            elif isinstance(child, ast.Assign):
+            if isinstance(child, _FUNC_DEFS):
+                self._visit_func(child)
+            elif isinstance(child, ast.Assign | ast.AnnAssign | ast.AugAssign):
+                # `x = ...`, and (Phase 5, item 7) `x: int = 0` / `x += 1`.
                 class_level.generic_visit(child)
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+    def _visit_func(self, node: _FuncDef) -> None:
         assert self._current is not None
         params = tuple(arg.arg for arg in node.args.args)
         self._current.methods[node.name] = MethodInfo(node.name, params)
-        # Re-dispatches visit_FunctionDef / visit_ClassDef / visit_Attribute
-        # on descendants, exactly as the original's generic_visit did.
+        # Re-dispatches visit_FunctionDef / visit_AsyncFunctionDef /
+        # visit_ClassDef / visit_Attribute on descendants, exactly as the
+        # original's generic_visit did.
         self.generic_visit(node)
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        self._visit_func(node)
+
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        self._visit_func(node)
 
     def visit_Attribute(self, node: ast.Attribute) -> None:
         if self._current is None or not isinstance(node.ctx, ast.Store):

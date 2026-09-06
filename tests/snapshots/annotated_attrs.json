@@ -4,18 +4,18 @@
       "classes": [
         {
           "cbo": 0,
-          "class_name": "Fetcher",
+          "class_name": "Config",
           "dit": 0,
-          "lcom": 1,
+          "lcom": 0,
           "loc": 8,
           "mpc": 0,
           "nocc": 0,
-          "nom": 3,
-          "rfc": 3,
-          "size2": 5,
-          "wac": 2,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 6,
+          "wac": 5,
           "wmpc1": 1.0,
-          "wmpc2": 8
+          "wmpc2": 2
         }
       ],
       "file_name": "module_a.py"

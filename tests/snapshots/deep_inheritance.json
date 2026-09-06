@@ -5,8 +5,7 @@
         {
           "cbo": 1,
           "class_name": "Animal",
-          "dit": 1,
-          "hierarchy": 1,
+          "dit": 0,
           "lcom": 1,
           "loc": 5,
           "mpc": 0,
@@ -21,8 +20,7 @@
         {
           "cbo": 2,
           "class_name": "Dog",
-          "dit": 3,
-          "hierarchy": 3,
+          "dit": 2,
           "lcom": 0,
           "loc": 3,
           "mpc": 0,
@@ -37,8 +35,7 @@
         {
           "cbo": 3,
           "class_name": "Mammal",
-          "dit": 2,
-          "hierarchy": 2,
+          "dit": 1,
           "lcom": 0,
           "loc": 4,
           "mpc": 1,
@@ -53,8 +50,7 @@
         {
           "cbo": 1,
           "class_name": "Puppy",
-          "dit": 4,
-          "hierarchy": 4,
+          "dit": 3,
           "lcom": 0,
           "loc": 3,
           "mpc": 0,

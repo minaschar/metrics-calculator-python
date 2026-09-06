@@ -7,13 +7,31 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 DEFAULT_INCLUDE: tuple[str, ...] = ("**/*.py",)
-# Empty by default so behaviour matches the pre-rewrite engine, which walks
-# every .py file it finds with no exclusions at all -- including .venv/,
-# site-packages/ and __pycache__/ (see project brief Phase 5, item 8). That
-# default changes deliberately in Phase 5; for now this only lets a caller
-# opt in to excluding directories, it doesn't change what happens by
-# default.
-DEFAULT_EXCLUDE: tuple[str, ...] = ()
+# Phase 5, item 8: the pre-rewrite engine walked every .py file it found,
+# including the analysed project's own virtualenv, vendored packages and
+# caches -- which polluted NOC and every project-wide name lookup. These
+# directories are now skipped by default; a config can override `exclude`
+# to change the set.
+DEFAULT_EXCLUDE: tuple[str, ...] = (
+    "**/.git/**",
+    "**/.hg/**",
+    "**/.svn/**",
+    "**/.venv/**",
+    "**/venv/**",
+    "**/env/**",
+    "**/.tox/**",
+    "**/.nox/**",
+    "**/.eggs/**",
+    "**/*.egg-info/**",
+    "**/site-packages/**",
+    "**/node_modules/**",
+    "**/__pycache__/**",
+    "**/.mypy_cache/**",
+    "**/.pytest_cache/**",
+    "**/.ruff_cache/**",
+    "**/build/**",
+    "**/dist/**",
+)
 
 
 def _str_tuple(value: object, default: tuple[str, ...]) -> tuple[str, ...]:

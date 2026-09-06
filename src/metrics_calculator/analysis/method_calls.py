@@ -7,8 +7,10 @@ tool ran an equivalent walk three separate times per class.
 from __future__ import annotations
 
 import ast
-from collections.abc import Mapping
+from collections.abc import Set as AbstractSet
 from dataclasses import dataclass
+
+_FUNC_DEFS = (ast.FunctionDef, ast.AsyncFunctionDef)
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,57 +19,72 @@ class RemoteCall:
     method_name: str
 
 
+def _call_of(node: ast.Call) -> RemoteCall | None:
+    """The ``instance.method`` a call site invokes, or ``None`` if it is
+    not an attribute call on a simple receiver.
+
+    Phase 5, item 4: only attributes in *call position* count. The
+    original walked every ``Call``'s whole subtree, so ``foo(bar.baz)``
+    recorded ``bar.baz`` as a remote call even though it is just an
+    argument read -- systematically inflating MPC and CBO.
+    """
+    func = node.func
+    if not isinstance(func, ast.Attribute):
+        return None  # a bare name call, or a subscript/lambda callee
+    receiver = func.value
+    if isinstance(receiver, ast.Name):
+        return RemoteCall(receiver.id, func.attr)
+    if isinstance(receiver, ast.Call) and isinstance(receiver.func, ast.Name):
+        # `factory().method(...)` -- the original credited this to the
+        # factory name; kept.
+        return RemoteCall(receiver.func.id, func.attr)
+    return None
+
+
 class _MethodCallVisitor(ast.NodeVisitor):
-    """A call is only recorded if some class *somewhere* in the project
-    defines a method of that name -- and, faithfully reproducing the
-    original tool's defect, once per file that does so (see project brief
-    Phase 5, item 3: `validate_remote_method`'s `break` only exits the
-    inner per-file loop, so one call site is counted once per matching
-    file). `files_with_method` maps a method name to the number of
-    distinct files containing a class that defines it. Fixing the
-    double-count is out of scope until Phase 5.
+    """Records a call ``obj.method(...)`` once per call site, when
+    ``method`` is the name of a method defined by some class in the
+    project (name-only matching -- no type resolution).
+
+    Phase 5, item 3: the original appended the call once *per file* that
+    contained a class defining that name (`validate_remote_method`'s
+    `break` exited only the inner class loop), inflating MPC and CBO.
+    `defined_methods` is now a flat set and each call site counts once.
     """
 
-    def __init__(self, class_name: str, files_with_method: Mapping[str, int]) -> None:
+    def __init__(self, class_name: str, defined_methods: AbstractSet[str]) -> None:
         self._class_name = class_name
-        self._files_with_method = files_with_method
+        self._defined_methods = defined_methods
         self.calls: list[RemoteCall] = []
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         for child in node.body:
-            if isinstance(child, ast.FunctionDef):
-                self.visit_FunctionDef(child)
+            if isinstance(child, _FUNC_DEFS):
+                self._visit_func(child)
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+    def _visit_func(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
         for child in ast.walk(node):
             if isinstance(child, ast.Call):
-                self.generic_visit(child)
+                self._record(_call_of(child))
 
-    def visit_Attribute(self, node: ast.Attribute) -> None:
-        if isinstance(node.value, ast.Name):
-            self._record(node.attr, node.value.id)
-        elif isinstance(node.value, ast.Call):
-            # Nested exactly as the original: when the receiver is a call
-            # whose callee is *not* a bare name (a chained call like
-            # `formatter.getvalue().rstrip(...)`), the original does
-            # nothing and does NOT recurse. Recursing here would let the
-            # outer `ast.walk` loop and this descent both reach the inner
-            # `formatter.getvalue`, double-counting it (MPC/CBO).
-            if isinstance(node.value.func, ast.Name):
-                self._record(node.attr, node.value.func.id)
-        else:
-            self.generic_visit(node)
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        self._visit_func(node)
 
-    def _record(self, method_name: str, instance_name: str) -> None:
-        if not method_name or instance_name in ("self", self._class_name):
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        self._visit_func(node)
+
+    def _record(self, call: RemoteCall | None) -> None:
+        if call is None or not call.method_name:
             return
-        file_count = self._files_with_method.get(method_name, 0)
-        self.calls.extend(RemoteCall(instance_name, method_name) for _ in range(file_count))
+        if call.instance_name in ("self", self._class_name):
+            return
+        if call.method_name in self._defined_methods:
+            self.calls.append(call)
 
 
 def remote_method_calls(
-    node: ast.ClassDef, class_name: str, files_with_method: Mapping[str, int]
+    node: ast.ClassDef, class_name: str, defined_methods: AbstractSet[str]
 ) -> list[RemoteCall]:
-    visitor = _MethodCallVisitor(class_name, files_with_method)
+    visitor = _MethodCallVisitor(class_name, defined_methods)
     visitor.visit_ClassDef(node)
     return visitor.calls

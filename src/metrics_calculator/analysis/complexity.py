@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import ast
 
+_FUNC_DEFS = (ast.FunctionDef, ast.AsyncFunctionDef)
+
 
 class _CyclomaticComplexityVisitor(ast.NodeVisitor):
     def __init__(self) -> None:
@@ -11,12 +13,18 @@ class _CyclomaticComplexityVisitor(ast.NodeVisitor):
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         for child in node.body:
-            if isinstance(child, ast.FunctionDef):
-                self.visit_FunctionDef(child)
+            if isinstance(child, _FUNC_DEFS):
+                self._visit_func(child)
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+    def _visit_func(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
         self.complexity += 1
         self.generic_visit(node)
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        self._visit_func(node)
+
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        self._visit_func(node)
 
     def visit_For(self, node: ast.For) -> None:
         self.complexity += 1
@@ -45,10 +53,7 @@ class _CyclomaticComplexityVisitor(ast.NodeVisitor):
 
 def cyclomatic_complexity(node: ast.ClassDef) -> int:
     """Sums a rough per-method cyclomatic complexity across the class.
-
-    `async def` methods are invisible here, matching the original tool
-    (see project brief Phase 5, item 5).
-    """
+    `async def` methods are included (Phase 5, item 5)."""
     visitor = _CyclomaticComplexityVisitor()
     visitor.visit_ClassDef(node)
     return visitor.complexity

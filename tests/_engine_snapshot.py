@@ -1,6 +1,6 @@
-"""Runs the new `metrics_calculator.analyze()` engine and serialises its
-output to the same shape as `_analysis_harness.py` (the legacy engine),
-so both can be checked against the same committed golden snapshots.
+"""Serialises `metrics_calculator.analyze()` output to the flat per-class
+shape stored in ``tests/snapshots/`` and consumed by
+``test_engine_snapshots.py``.
 """
 
 from __future__ import annotations
@@ -21,11 +21,6 @@ def analyze_fixture(fixture_dir: Path) -> dict[str, Any]:
             classes_payload.append(
                 {
                     "class_name": class_metrics.class_name,
-                    # `dit` and `hierarchy` are stored separately (see
-                    # ComplexityMetrics) because the original's misdirected
-                    # DIT write leaves them with different defaults on some
-                    # classes.
-                    "hierarchy": class_metrics.complexity.hierarchy,
                     "loc": class_metrics.size.loc,
                     "nom": class_metrics.size.nom,
                     "size2": class_metrics.size.size2,

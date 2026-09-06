@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 from .analysis.cohesion import field_uses_by_method, lack_of_cohesion
@@ -35,24 +35,21 @@ logger = logging.getLogger(__name__)
 class _ProjectIndex:
     classes: list[ClassFacts]
     classes_by_name: dict[str, list[ClassFacts]]
-    files_with_method: dict[str, int]
+    defined_methods: set[str]
 
 
 def _build_index(files: list[FileFacts]) -> _ProjectIndex:
     classes: list[ClassFacts] = []
     classes_by_name: dict[str, list[ClassFacts]] = defaultdict(list)
-    files_with_method: dict[str, int] = defaultdict(int)
+    defined_methods: set[str] = set()
 
     for file in files:
-        method_names_in_file: set[str] = set()
         for class_facts in file.classes:
             classes.append(class_facts)
             classes_by_name[class_facts.name].append(class_facts)
-            method_names_in_file.update(class_facts.methods)
-        for name in method_names_in_file:
-            files_with_method[name] += 1
+            defined_methods.update(class_facts.methods)
 
-    return _ProjectIndex(classes, dict(classes_by_name), dict(files_with_method))
+    return _ProjectIndex(classes, dict(classes_by_name), defined_methods)
 
 
 def _count_children(target: ClassFacts, index: _ProjectIndex) -> int:
@@ -69,64 +66,42 @@ def _resolve_parents(target: ClassFacts, index: _ProjectIndex) -> list[ClassFact
     return [c for c in index.classes for name in target.base_names if c.name == name]
 
 
-@dataclass(slots=True)
-class _Hierarchy:
-    """DIT-computation state, ported verbatim from the original.
+def _depth_of_inheritance(
+    target: ClassFacts,
+    index: _ProjectIndex,
+    cache: dict[int, int],
+    visiting: frozenset[int] = frozenset(),
+) -> int:
+    """DIT as a pure function of the class and its ancestors (brief Phase
+    5, items 1-2).
 
-    `hier` mirrors `Class.hierarchy` (instance default -1); `dit` mirrors
-    `ComplexityCategory.dit` (class-attribute default 0). They usually hold
-    the same number, but when a write is misdirected onto an ancestor
-    (brief Phase 5, item 1) the class keeps each field's own default.
+    ``dit(C)`` is 0 for a class with no project-internal base, otherwise
+    ``1 + max(dit(p))`` over its project-internal bases. It no longer
+    depends on iteration order, on which class a write happens to land on,
+    or on whether ``C`` has children. An inheritance cycle is broken by
+    treating the already-visited class as depth 0.
     """
+    cached = cache.get(id(target))
+    if cached is not None:
+        return cached
+    if id(target) in visiting:
+        return 0
 
-    hier: dict[int, int] = field(default_factory=dict)
-    dit: dict[int, int] = field(default_factory=dict)
+    parents = _resolve_parents(target, index)
+    if not parents:
+        cache[id(target)] = 0
+        return 0
 
-
-def _calc_dit(
-    target: ClassFacts, index: _ProjectIndex, state: _Hierarchy, current: list[ClassFacts]
-) -> None:
-    """Faithful, deliberately unfixed port of `MetricsCalculator.calc_dit`
-    / `return_max_parent_depth` (brief Phase 5, items 1-2):
-
-    - the final `set_dit` / `set_hierarchy` land on whichever ancestor the
-      recursion last pointed `current` at, not necessarily `target`;
-    - a just-recursed ancestor's depth is never folded into
-      `max_parent_depth`, so an all-recursed parent list yields the
-      sentinel `-2` and DIT `-1`;
-    - `hier == -1` means "not computed", so a legitimate `-1` result is
-      recomputed every time the class is seen as a parent.
-
-    No cycle guard, matching the original -- a Phase 5 addition.
-    """
-    current[0] = target
-    children = _count_children(target, index)
-
-    if not target.base_names and children == 0:
-        state.hier[id(target)] = 0
-        state.dit[id(target)] = 0
-        return
-    if not target.base_names and children != 0:
-        state.hier[id(target)] = 1
-        state.dit[id(target)] = 1
-        return
-
-    max_parent_depth = -2
-    for parent in _resolve_parents(target, index):
-        if state.hier.get(id(parent), -1) == -1:
-            _calc_dit(parent, index, state, current)
-        elif state.hier[id(parent)] > max_parent_depth:
-            max_parent_depth = state.hier[id(parent)]
-
-    subject = current[0]
-    state.hier[id(subject)] = max_parent_depth + 1
-    state.dit[id(subject)] = max_parent_depth + 1
+    deeper = visiting | {id(target)}
+    depth = 1 + max(_depth_of_inheritance(p, index, cache, deeper) for p in parents)
+    cache[id(target)] = depth
+    return depth
 
 
 def _compute_class_metrics(
     target: ClassFacts,
     index: _ProjectIndex,
-    state: _Hierarchy,
+    dit_cache: dict[int, int],
     file_lines: tuple[str, ...],
 ) -> ClassMetrics:
     nom = len(target.methods)
@@ -134,7 +109,7 @@ def _compute_class_metrics(
     wac = len(target.fields)
     nocc = _count_children(target, index)
 
-    calls = remote_method_calls(target.ast_node, target.name, index.files_with_method)
+    calls = remote_method_calls(target.ast_node, target.name, index.defined_methods)
     distinct_calls = {(c.instance_name, c.method_name) for c in calls}
     instance_names = {c.instance_name for c in calls}
 
@@ -149,11 +124,10 @@ def _compute_class_metrics(
         nocc=nocc,
     )
     complexity = ComplexityMetrics(
-        dit=state.dit.get(id(target), 0),
+        dit=_depth_of_inheritance(target, index, dit_cache),
         wmpc1=round(cc / nom, 2) if nom else 0.0,
         wmpc2=nom + param_count,
         rfc=nom + len(distinct_calls),
-        hierarchy=state.hier.get(id(target), -1),
     )
     coupling = CouplingMetrics(
         cbo=len(instance_names | set(target.base_names)) + nocc,
@@ -192,14 +166,7 @@ def analyze(
         file.classes = extract_classes(file)
 
     index = _build_index(files)
-
-    # One `calc_dit` per class in discovery order, each with a fresh
-    # `current` holder -- the original ran a new MetricsCalculator per
-    # class, so its `self.curr_dit_class` reset between classes but not
-    # within a class's own recursion.
-    state = _Hierarchy()
-    for class_facts in index.classes:
-        _calc_dit(class_facts, index, state, [class_facts])
+    dit_cache: dict[int, int] = {}
 
     file_metrics: list[FileMetrics] = []
     total = len(files)
@@ -207,7 +174,7 @@ def analyze(
         metrics = FileMetrics(file_name=file.path.name, file_path=str(file.path))
         for class_facts in file.classes:
             metrics.classes.append(
-                _compute_class_metrics(class_facts, index, state, file.source_lines)
+                _compute_class_metrics(class_facts, index, dit_cache, file.source_lines)
             )
         file_metrics.append(metrics)
         if on_progress is not None:
