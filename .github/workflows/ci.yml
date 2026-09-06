@@ -3,7 +3,9 @@ name: CI
 on:
   push:
     branches: [master]
+    tags: ["v*"]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -12,6 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
+    env:
+      # The GUI smoke tests import PySide6; run Qt headless.
+      QT_QPA_PLATFORM: offscreen
     steps:
       - uses: actions/checkout@v4
 
@@ -20,6 +25,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           enable-cache: true
+
+      - name: Install Qt runtime libraries
+        run: >
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends
+          libegl1 libgl1 libxkbcommon-x11-0 libdbus-1-3 libglib2.0-0
+          libfontconfig1 libfreetype6
 
       - name: Install dependencies
         run: uv sync --locked
@@ -35,3 +46,52 @@ jobs:
 
       - name: Pytest
         run: uv run pytest -v
+
+  package:
+    # Desktop deliverable: a single-file executable per OS. Runs on master
+    # pushes, version tags and manual dispatch -- not on every PR, to keep
+    # PR feedback fast.
+    if: github.event_name != 'pull_request'
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: metrics-calculator-windows
+          - os: macos-latest
+            artifact: metrics-calculator-macos
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install dependencies (gui + xlsx export + pyinstaller)
+        run: uv sync --locked --extra gui --extra cli
+
+      - name: Build executable
+        run: uv run pyinstaller --clean --noconfirm packaging/metrics-calculator-gui.spec
+
+      - name: Smoke-test the executable
+        shell: bash
+        env:
+          QT_QPA_PLATFORM: offscreen
+          MC_GUI_SELFTEST: "1"
+        run: |
+          bin=dist/MetricsCalculator
+          [ -f "$bin.exe" ] && bin="$bin.exe"
+          # Windowed binary: no stdout. MC_GUI_SELFTEST makes it build the
+          # window, pump the queue once and exit 0. A hang -> job timeout.
+          "$bin" "$PWD"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/MetricsCalculator*
+          if-no-files-found: error

@@ -8,6 +8,7 @@ library.
 from __future__ import annotations
 
 import logging
+from importlib.metadata import PackageNotFoundError, version
 
 from .config import AnalysisConfig
 from .diagnostics import Diagnostic
@@ -31,6 +32,11 @@ from .results import (
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
+try:
+    __version__ = version("metrics-calculator-python")
+except PackageNotFoundError:  # pragma: no cover - running from a source tree
+    __version__ = "0.0.0+unknown"
+
 __all__ = [
     "METRIC_REGISTRY",
     "PROJECT_METRIC_REGISTRY",
@@ -46,5 +52,6 @@ __all__ = [
     "ProjectMetrics",
     "QmoodMetrics",
     "SizeMetrics",
+    "__version__",
     "analyze",
 ]

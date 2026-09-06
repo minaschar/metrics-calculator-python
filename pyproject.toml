@@ -17,9 +17,17 @@ dependencies = []
 
 [project.optional-dependencies]
 cli = ["typer>=0.12", "rich>=13.7", "pandas>=2.1", "openpyxl>=3.1"]
+# The desktop app only touches QtCore/QtGui/QtWidgets, so it depends on
+# pyside6-essentials rather than the full `pyside6` meta-package -- that
+# drops the ~160 MB pyside6-addons wheel (QtCharts, QtWebEngine, Qt3D,
+# ...) which nothing here imports. `pip install
+# metrics-calculator-python[cli,gui]` additionally enables .xlsx export
+# from the results table.
+gui = ["pyside6-essentials>=6.7"]
 
 [project.scripts]
 metrics-calculator = "metrics_calculator.cli.app:app"
+metrics-calculator-gui = "metrics_calculator.gui.app:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/metrics_calculator"]
@@ -38,6 +46,9 @@ dev = [
     "pandas>=2.1",
     "openpyxl>=3.1",
     "pandas-stubs>=2.1",
+    "pytest-qt>=4.4",
+    "pyinstaller>=6.10",
+    "pyside6-essentials>=6.7",
 ]
 
 [tool.uv]
@@ -64,6 +75,12 @@ extend-exclude = ["app", "tests/fixtures"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "RUF"]
+
+[tool.ruff.lint.flake8-bugbear]
+# Qt's virtual model methods are defined with `QModelIndex()` as the
+# default parent argument -- it's the framework's own idiom and the value
+# is never mutated.
+extend-immutable-calls = ["PySide6.QtCore.QModelIndex"]
 
 [tool.mypy]
 python_version = "3.11"
