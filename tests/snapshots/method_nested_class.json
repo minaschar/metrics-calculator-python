@@ -1,0 +1,58 @@
+{
+  "files": [
+    {
+      "classes": [
+        {
+          "cbo": 0,
+          "class_name": "Cache",
+          "dit": 0,
+          "hierarchy": 0,
+          "lcom": 0,
+          "loc": 3,
+          "mpc": 0,
+          "nocc": 0,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 3,
+          "wac": 2,
+          "wmpc1": 1.0,
+          "wmpc2": 3
+        },
+        {
+          "cbo": 0,
+          "class_name": "Cache",
+          "dit": 0,
+          "hierarchy": 0,
+          "lcom": 0,
+          "loc": 3,
+          "mpc": 0,
+          "nocc": 0,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 1,
+          "wac": 0,
+          "wmpc1": 1.0,
+          "wmpc2": 3
+        },
+        {
+          "cbo": 0,
+          "class_name": "Outer",
+          "dit": 0,
+          "hierarchy": 0,
+          "lcom": 1,
+          "loc": 8,
+          "mpc": 0,
+          "nocc": 0,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 1,
+          "wac": 0,
+          "wmpc1": 2.0,
+          "wmpc2": 3
+        }
+      ],
+      "file_name": "module_a.py"
+    }
+  ],
+  "noc": 3
+}

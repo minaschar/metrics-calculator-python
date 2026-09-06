@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from .analysis.cohesion import field_uses_by_method, lack_of_cohesion
@@ -55,69 +55,84 @@ def _build_index(files: list[FileFacts]) -> _ProjectIndex:
     return _ProjectIndex(classes, dict(classes_by_name), dict(files_with_method))
 
 
-def _children_of(target: ClassFacts, all_classes: list[ClassFacts]) -> list[ClassFacts]:
-    return [c for c in all_classes if target.name in c.base_names]
+def _count_children(target: ClassFacts, index: _ProjectIndex) -> int:
+    """`return_children`: concatenate every class's simple base names
+    across the whole project (duplicate class entries for a method-nested
+    class included) and count how many equal this class's name."""
+    return sum(1 for c in index.classes for name in c.base_names if name == target.name)
 
 
 def _resolve_parents(target: ClassFacts, index: _ProjectIndex) -> list[ClassFacts]:
-    # Matches every project class whose simple name appears in this class's
-    # declared bases -- including duplicates across files with clashing
-    # names, a latent correctness gap that isn't in the Phase 5 bug list
-    # and is preserved here rather than silently fixed.
-    parents: list[ClassFacts] = []
-    for base_name in target.base_names:
-        parents.extend(index.classes_by_name.get(base_name, ()))
-    return parents
+    """`convert_to_actual_parent_objects`: project discovery order, one
+    entry per (class, matching base name) pair -- so a class listed under
+    two of `target`'s bases, or a duplicate class entry, appears twice."""
+    return [c for c in index.classes for name in target.base_names if c.name == name]
 
 
-def _compute_hierarchy(target: ClassFacts, index: _ProjectIndex, hierarchy: dict[int, int]) -> None:
-    """Depth-of-inheritance-tree, keyed by `id(ClassFacts)`.
+@dataclass(slots=True)
+class _Hierarchy:
+    """DIT-computation state, ported verbatim from the original.
 
-    This is a faithful, deliberately unfixed port of the original
-    `MetricsCalculator.calc_dit` / `return_max_parent_depth`. It reproduces
-    two known defects (see project brief Phase 5, items 1-2):
-
-    - the final write can land on whichever ancestor was last recursed
-      into (the `current` local below), rather than always being `target`;
-    - a freshly-recursed ancestor's depth is never folded into
-      `max_parent_depth` in the same pass.
-
-    Fixing this is explicitly out of scope until Phase 5, where each
-    defect gets its own commit with a snapshot diff. No cycle guard either,
-    matching the original -- also a Phase 5 addition.
+    `hier` mirrors `Class.hierarchy` (instance default -1); `dit` mirrors
+    `ComplexityCategory.dit` (class-attribute default 0). They usually hold
+    the same number, but when a write is misdirected onto an ancestor
+    (brief Phase 5, item 1) the class keeps each field's own default.
     """
-    current = target
-    children = _children_of(target, index.classes)
 
-    if not target.base_names and not children:
-        hierarchy[id(current)] = 0
+    hier: dict[int, int] = field(default_factory=dict)
+    dit: dict[int, int] = field(default_factory=dict)
+
+
+def _calc_dit(
+    target: ClassFacts, index: _ProjectIndex, state: _Hierarchy, current: list[ClassFacts]
+) -> None:
+    """Faithful, deliberately unfixed port of `MetricsCalculator.calc_dit`
+    / `return_max_parent_depth` (brief Phase 5, items 1-2):
+
+    - the final `set_dit` / `set_hierarchy` land on whichever ancestor the
+      recursion last pointed `current` at, not necessarily `target`;
+    - a just-recursed ancestor's depth is never folded into
+      `max_parent_depth`, so an all-recursed parent list yields the
+      sentinel `-2` and DIT `-1`;
+    - `hier == -1` means "not computed", so a legitimate `-1` result is
+      recomputed every time the class is seen as a parent.
+
+    No cycle guard, matching the original -- a Phase 5 addition.
+    """
+    current[0] = target
+    children = _count_children(target, index)
+
+    if not target.base_names and children == 0:
+        state.hier[id(target)] = 0
+        state.dit[id(target)] = 0
         return
-    if not target.base_names and children:
-        hierarchy[id(current)] = 1
+    if not target.base_names and children != 0:
+        state.hier[id(target)] = 1
+        state.dit[id(target)] = 1
         return
 
-    parents = _resolve_parents(target, index)
     max_parent_depth = -2
-    for parent in parents:
-        depth = hierarchy.get(id(parent))
-        if depth is None:
-            _compute_hierarchy(parent, index, hierarchy)
-            current = parent
-        elif depth > max_parent_depth:
-            max_parent_depth = depth
-    hierarchy[id(current)] = max_parent_depth + 1
+    for parent in _resolve_parents(target, index):
+        if state.hier.get(id(parent), -1) == -1:
+            _calc_dit(parent, index, state, current)
+        elif state.hier[id(parent)] > max_parent_depth:
+            max_parent_depth = state.hier[id(parent)]
+
+    subject = current[0]
+    state.hier[id(subject)] = max_parent_depth + 1
+    state.dit[id(subject)] = max_parent_depth + 1
 
 
 def _compute_class_metrics(
     target: ClassFacts,
     index: _ProjectIndex,
-    hierarchy: dict[int, int],
+    state: _Hierarchy,
     file_lines: tuple[str, ...],
 ) -> ClassMetrics:
     nom = len(target.methods)
     param_count = sum(len(m.parameters) for m in target.methods.values())
     wac = len(target.fields)
-    nocc = len(_children_of(target, index.classes))
+    nocc = _count_children(target, index)
 
     calls = remote_method_calls(target.ast_node, target.name, index.files_with_method)
     distinct_calls = {(c.instance_name, c.method_name) for c in calls}
@@ -134,10 +149,11 @@ def _compute_class_metrics(
         nocc=nocc,
     )
     complexity = ComplexityMetrics(
-        dit=hierarchy.get(id(target), 0),
+        dit=state.dit.get(id(target), 0),
         wmpc1=round(cc / nom, 2) if nom else 0.0,
         wmpc2=nom + param_count,
         rfc=nom + len(distinct_calls),
+        hierarchy=state.hier.get(id(target), -1),
     )
     coupling = CouplingMetrics(
         cbo=len(instance_names | set(target.base_names)) + nocc,
@@ -177,9 +193,13 @@ def analyze(
 
     index = _build_index(files)
 
-    hierarchy: dict[int, int] = {}
+    # One `calc_dit` per class in discovery order, each with a fresh
+    # `current` holder -- the original ran a new MetricsCalculator per
+    # class, so its `self.curr_dit_class` reset between classes but not
+    # within a class's own recursion.
+    state = _Hierarchy()
     for class_facts in index.classes:
-        _compute_hierarchy(class_facts, index, hierarchy)
+        _calc_dit(class_facts, index, state, [class_facts])
 
     file_metrics: list[FileMetrics] = []
     total = len(files)
@@ -187,7 +207,7 @@ def analyze(
         metrics = FileMetrics(file_name=file.path.name, file_path=str(file.path))
         for class_facts in file.classes:
             metrics.classes.append(
-                _compute_class_metrics(class_facts, index, hierarchy, file.source_lines)
+                _compute_class_metrics(class_facts, index, state, file.source_lines)
             )
         file_metrics.append(metrics)
         if on_progress is not None:

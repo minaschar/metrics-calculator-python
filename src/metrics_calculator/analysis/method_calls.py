@@ -46,8 +46,15 @@ class _MethodCallVisitor(ast.NodeVisitor):
     def visit_Attribute(self, node: ast.Attribute) -> None:
         if isinstance(node.value, ast.Name):
             self._record(node.attr, node.value.id)
-        elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name):
-            self._record(node.attr, node.value.func.id)
+        elif isinstance(node.value, ast.Call):
+            # Nested exactly as the original: when the receiver is a call
+            # whose callee is *not* a bare name (a chained call like
+            # `formatter.getvalue().rstrip(...)`), the original does
+            # nothing and does NOT recurse. Recursing here would let the
+            # outer `ast.walk` loop and this descent both reach the inner
+            # `formatter.getvalue`, double-counting it (MPC/CBO).
+            if isinstance(node.value.func, ast.Name):
+                self._record(node.attr, node.value.func.id)
         else:
             self.generic_visit(node)
 

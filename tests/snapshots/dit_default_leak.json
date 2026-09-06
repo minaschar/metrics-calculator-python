@@ -1,0 +1,42 @@
+{
+  "files": [
+    {
+      "classes": [
+        {
+          "cbo": 1,
+          "class_name": "Leaf",
+          "dit": 0,
+          "hierarchy": -1,
+          "lcom": 0,
+          "loc": 3,
+          "mpc": 0,
+          "nocc": 0,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 1,
+          "wac": 0,
+          "wmpc1": 1.0,
+          "wmpc2": 2
+        },
+        {
+          "cbo": 1,
+          "class_name": "Root",
+          "dit": 1,
+          "hierarchy": 1,
+          "lcom": 0,
+          "loc": 3,
+          "mpc": 0,
+          "nocc": 1,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 1,
+          "wac": 0,
+          "wmpc1": 1.0,
+          "wmpc2": 2
+        }
+      ],
+      "file_name": "module_a.py"
+    }
+  ],
+  "noc": 2
+}

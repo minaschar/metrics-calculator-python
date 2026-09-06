@@ -22,6 +22,16 @@ class ComplexityMetrics:
     wmpc1: float = 0.0
     wmpc2: int = 0
     rfc: int = 0
+    # Internal DIT-computation state carried over verbatim from the
+    # original tool, where `hierarchy` and `dit` were stored separately and
+    # usually -- but not always -- held the same number: when the original's
+    # `calc_dit` misdirects its write onto an ancestor (project brief Phase
+    # 5, item 1), the class keeps `hierarchy = -1` (its instance default)
+    # while `dit` keeps `0` (a class-attribute default). Not a published
+    # metric, not in the registry, not exported; kept only so the
+    # golden-snapshot check stays exact through Phase 4. Phase 5 collapses
+    # this back into `dit`.
+    hierarchy: int = -1
 
 
 @dataclass(slots=True)

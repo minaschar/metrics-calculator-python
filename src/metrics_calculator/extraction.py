@@ -1,6 +1,25 @@
 """Structural facts pulled from a parsed module: classes, their methods,
 fields and declared base names. This is the "first pass" the rest of the
 engine builds on -- it does not compute any metric itself.
+
+This is a faithful port of the original tool's ``InitCommonsNodeVisitor``
+(plus ``ClassAttrNodeVisitor``). Its quirks are deliberately preserved so
+the metric numbers do not move before Phase 5:
+
+- ``def``s nested inside a method body are collected as methods of the
+  enclosing class (the original's ``visit_FunctionDef`` calls
+  ``generic_visit``, which re-dispatches ``visit_FunctionDef`` on every
+  nested function). This inflates NOM and everything derived from it.
+- a ``class`` nested inside a *method* body is processed twice -- once
+  while descending that method, once by the module-level ``ast.walk`` --
+  and, while it is being processed, ``curr_class`` is repointed at it and
+  never restored, so later attribute writes in that method land on the
+  nested class.
+- only positional args are counted per method; ``async def`` is ignored;
+  only ``ast.Name`` bases are recognised; only plain ``ast.Assign``
+  targets are seen as fields.
+
+See project brief Phase 5, items 5-7 and 9.
 """
 
 from __future__ import annotations
@@ -41,29 +60,9 @@ def _base_names(node: ast.ClassDef) -> tuple[str, ...]:
     return tuple(base.id for base in node.bases if isinstance(base, ast.Name))
 
 
-class _MethodBodyFieldCollector(ast.NodeVisitor):
-    """Finds `self.x = ...` / `ClassName.x = ...` writes inside a method
-    body. Only plain `ast.Assign` targets are recognised -- annotated
-    (`x: int = 0`) and augmented (`x += 1`) assignments are missed, matching
-    the original tool (see project brief Phase 5, item 7).
-    """
-
-    def __init__(self, class_name: str, fields: set[str]) -> None:
-        self._class_name = class_name
-        self._fields = fields
-
-    def visit_Attribute(self, node: ast.Attribute) -> None:
-        if not isinstance(node.ctx, ast.Store) or not isinstance(node.value, ast.Name):
-            return
-        if node.value.id == "self":
-            self._fields.add(f"self.{node.attr}")
-        elif node.value.id == self._class_name:
-            self._fields.add(f"{self._class_name}.{node.attr}")
-
-
 class _ClassLevelFieldCollector(ast.NodeVisitor):
-    """Finds class-level `x = ...` writes, including tuple/list unpacking
-    targets (`a, b = 1, 2`)."""
+    """`ClassAttrNodeVisitor`: every `Store` name anywhere under a
+    class-body `ast.Assign` becomes `ClassName.<name>`."""
 
     def __init__(self, class_name: str, fields: set[str]) -> None:
         self._class_name = class_name
@@ -74,36 +73,63 @@ class _ClassLevelFieldCollector(ast.NodeVisitor):
             self._fields.add(f"{self._class_name}.{node.id}")
 
 
-def _extract_class(node: ast.ClassDef, file_name: str) -> ClassFacts:
-    facts = ClassFacts(
-        name=node.name, file_name=file_name, ast_node=node, base_names=_base_names(node)
-    )
-    method_collector = _MethodBodyFieldCollector(node.name, facts.fields)
-    class_level_collector = _ClassLevelFieldCollector(node.name, facts.fields)
+class _StructureVisitor(ast.NodeVisitor):
+    """Port of ``InitCommonsNodeVisitor``.
 
-    for child in node.body:
-        # Only plain `def` methods are recognised; `async def` methods are
-        # invisible here, matching the original tool (see project brief
-        # Phase 5, item 5).
-        if isinstance(child, ast.FunctionDef):
-            params = tuple(arg.arg for arg in child.args.args)
-            facts.methods[child.name] = MethodInfo(child.name, params)
-            method_collector.generic_visit(child)
-        elif isinstance(child, ast.Assign):
-            class_level_collector.generic_visit(child)
+    Run once over a module. ``classes`` ends up holding one ``ClassFacts``
+    per ``visit_ClassDef`` call, in the same order and with the same
+    multiplicity the original tool's ``python_file.classes`` list had.
+    """
 
-    return facts
+    def __init__(self, file_name: str) -> None:
+        self._file_name = file_name
+        self._current: ClassFacts | None = None
+        self.classes: list[ClassFacts] = []
+
+    def visit_Module(self, node: ast.Module) -> None:
+        for child in ast.walk(node):
+            if isinstance(child, ast.ClassDef):
+                self.visit_ClassDef(child)
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        facts = ClassFacts(
+            name=node.name,
+            file_name=self._file_name,
+            ast_node=node,
+            base_names=_base_names(node),
+        )
+        self._current = facts
+        self.classes.append(facts)
+        class_level = _ClassLevelFieldCollector(node.name, facts.fields)
+        for child in node.body:
+            if isinstance(child, ast.FunctionDef):
+                self.visit_FunctionDef(child)
+            elif isinstance(child, ast.Assign):
+                class_level.generic_visit(child)
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        assert self._current is not None
+        params = tuple(arg.arg for arg in node.args.args)
+        self._current.methods[node.name] = MethodInfo(node.name, params)
+        # Re-dispatches visit_FunctionDef / visit_ClassDef / visit_Attribute
+        # on descendants, exactly as the original's generic_visit did.
+        self.generic_visit(node)
+
+    def visit_Attribute(self, node: ast.Attribute) -> None:
+        if self._current is None or not isinstance(node.ctx, ast.Store):
+            return
+        if not isinstance(node.value, ast.Name):
+            return
+        if node.value.id == "self":
+            self._current.fields.add(f"self.{node.attr}")
+        elif node.value.id == self._current.name:
+            self._current.fields.add(f"{self._current.name}.{node.attr}")
 
 
 def extract_classes(file_facts: FileFacts) -> list[ClassFacts]:
-    """Flattens every class in the module, including nested ones, into a
-    single list -- mirrors the original tool's `ast.walk`-based discovery,
-    which does not distinguish nesting depth. Whether that flattening is
-    the right taxonomy is an open question for Phase 3+, not addressed
-    here.
-    """
-    return [
-        _extract_class(node, file_facts.path.name)
-        for node in ast.walk(file_facts.module_ast)
-        if isinstance(node, ast.ClassDef)
-    ]
+    """Every class in the module, nested ones included, in ``ast.walk``
+    order -- with a method-nested class appearing twice, matching the
+    original tool."""
+    visitor = _StructureVisitor(file_facts.path.name)
+    visitor.visit_Module(file_facts.module_ast)
+    return visitor.classes

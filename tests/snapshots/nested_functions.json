@@ -1,0 +1,42 @@
+{
+  "files": [
+    {
+      "classes": [
+        {
+          "cbo": 0,
+          "class_name": "Registry",
+          "dit": 0,
+          "hierarchy": 0,
+          "lcom": 0,
+          "loc": 3,
+          "mpc": 0,
+          "nocc": 0,
+          "nom": 1,
+          "rfc": 1,
+          "size2": 1,
+          "wac": 0,
+          "wmpc1": 1.0,
+          "wmpc2": 2
+        },
+        {
+          "cbo": 1,
+          "class_name": "Widget",
+          "dit": 0,
+          "hierarchy": 0,
+          "lcom": 4,
+          "loc": 12,
+          "mpc": 1,
+          "nocc": 0,
+          "nom": 4,
+          "rfc": 5,
+          "size2": 5,
+          "wac": 1,
+          "wmpc1": 1.25,
+          "wmpc2": 9
+        }
+      ],
+      "file_name": "module_a.py"
+    }
+  ],
+  "noc": 2
+}

@@ -21,11 +21,11 @@ def analyze_fixture(fixture_dir: Path) -> dict[str, Any]:
             classes_payload.append(
                 {
                     "class_name": class_metrics.class_name,
-                    # The original tool always wrote `dit` and `hierarchy`
-                    # together with the identical value in every branch of
-                    # calc_dit -- they were redundant storage of the same
-                    # number. `dit` here reproduces that invariant.
-                    "hierarchy": class_metrics.complexity.dit,
+                    # `dit` and `hierarchy` are stored separately (see
+                    # ComplexityMetrics) because the original's misdirected
+                    # DIT write leaves them with different defaults on some
+                    # classes.
+                    "hierarchy": class_metrics.complexity.hierarchy,
                     "loc": class_metrics.size.loc,
                     "nom": class_metrics.size.nom,
                     "size2": class_metrics.size.size2,
