@@ -55,8 +55,6 @@ are preserved; their implementations were audited and their known defects fixed.
 
 - The QMOOD design-quality category (six attributes that were declared but never
   computed — always `0.0`). Recorded as future work in `docs/metrics.md`.
-- `app/requirements.txt` (UTF-16 encoded; `pip` could not read it), replaced by
-  the `uv`-managed `pyproject.toml`.
-
-The pre-rewrite `app/` package (its `pyuic5` GUI, the old engine and the
-Windows-only hardcoded paths) is superseded and slated for deletion.
+- The pre-rewrite `app/` package in its entirety: the `pyuic5`-generated GUI, the
+  old `ast`-visitor engine, the Windows-only hardcoded paths, and the UTF-16
+  `app/requirements.txt` that `pip` could not read.

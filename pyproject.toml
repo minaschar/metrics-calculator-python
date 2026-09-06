@@ -9,10 +9,11 @@ description = "Object-oriented software quality metrics calculator for Python co
 readme = "README.md"
 license = "EPL-2.0"
 requires-python = ">=3.11,<3.14"
-# The core engine (src/metrics_calculator, excluding cli/) has zero
-# runtime dependencies beyond the standard library -- it imports no UI
-# code and needs no data libraries. The CLI is an optional extra so a
-# bare `pip install metrics-calculator-python` stays dependency-free.
+# The core engine (src/metrics_calculator, excluding cli/ and gui/) has
+# zero runtime dependencies beyond the standard library -- it imports no
+# UI code and needs no data libraries. The CLI and desktop app are
+# optional extras so a bare `pip install metrics-calculator-python` stays
+# dependency-free.
 dependencies = []
 
 [project.optional-dependencies]
@@ -24,6 +25,10 @@ cli = ["typer>=0.12", "rich>=13.7", "pandas>=2.1", "openpyxl>=3.1"]
 # metrics-calculator-python[cli,gui]` additionally enables .xlsx export
 # from the results table.
 gui = ["pyside6-essentials>=6.7"]
+
+[project.urls]
+Repository = "https://github.com/ics20072/metrics-calculator-python"
+Changelog = "https://github.com/ics20072/metrics-calculator-python/blob/master/CHANGELOG.md"
 
 [project.scripts]
 metrics-calculator = "metrics_calculator.cli.app:app"
@@ -40,9 +45,6 @@ dev = [
     "pre-commit>=3.7",
     "typer>=0.12",
     "rich>=13.7",
-    # Also needed to run the legacy app/ during the Phase 1-4 transition
-    # (the old GUI + Excel export). Remove once app/ is deleted.
-    "pyqt5>=5.15.9",
     "pandas>=2.1",
     "openpyxl>=3.1",
     "pandas-stubs>=2.1",
@@ -51,27 +53,15 @@ dev = [
     "pyside6-essentials>=6.7",
 ]
 
-[tool.uv]
-# PyQt5-Qt5 (the bundled Qt binaries) stopped publishing Windows wheels
-# after 5.15.2 -- every later release on PyPI is Linux/macOS only. 5.15.2
-# is the newest version with wheels for all platforms we target, so it's
-# pinned here rather than left to float. Revisit when Phase 3 evaluates
-# PySide6; only relevant while the legacy app/ GUI is still around.
-constraint-dependencies = ["pyqt5-qt5==5.15.2"]
-
 [tool.pytest.ini_options]
-pythonpath = ["app"]
 testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-# `app/` is pre-rewrite legacy code (Phase 3 replaces its GUI outright,
-# Phase 1 already replaced its engine); linting it now would just be
-# noise. Drop this exclusion once app/ is deleted.
 # `tests/fixtures` holds deliberately minimal (and in one case deliberately
 # invalid) sample source used as analysis input, not maintained code.
-extend-exclude = ["app", "tests/fixtures"]
+extend-exclude = ["tests/fixtures"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "RUF"]
@@ -84,26 +74,9 @@ extend-immutable-calls = ["PySide6.QtCore.QModelIndex"]
 
 [tool.mypy]
 python_version = "3.11"
-# `app/` is untyped legacy code (Phase 3 replaces its GUI, Phase 1 already
-# replaced its engine); Phase 1's new package under src/ is fully typed and
-# strict-clean, but `app/` itself is excluded below rather than fixed out
-# of phase order.
-mypy_path = ["app"]
 files = ["src", "tests"]
 exclude = ["tests/fixtures"]
 strict = true
-# The test harness for the legacy engine necessarily calls into `app/`'s
-# untyped code. Without this, strict mode's disallow_untyped_calls flags
-# every such call. Drop once app/ is deleted.
-disallow_untyped_calls = false
-
-[[tool.mypy.overrides]]
-# `app/src` is untyped legacy code (see above). mypy still follows it from
-# the legacy test harness for inference, but its own internal errors
-# aren't ours to fix out of phase order, so they're suppressed here rather
-# than widening `files` to cover `app/`.
-module = "src.*"
-ignore_errors = true
 
 [[tool.mypy.overrides]]
 # pytest's assertion rewriter optionally imports numpy for array-diffing;

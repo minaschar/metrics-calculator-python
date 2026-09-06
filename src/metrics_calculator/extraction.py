@@ -2,23 +2,22 @@
 fields and declared base names. This is the "first pass" the rest of the
 engine builds on -- it does not compute any metric itself.
 
-Structurally this follows the original tool's ``InitCommonsNodeVisitor``
-(plus ``ClassAttrNodeVisitor``), including two quirks that are kept until
-they get their own Phase 5 fix:
+Two long-standing quirks of the analysis are preserved deliberately (they
+are not in the fixed-defect list and changing them would move measured
+values); both are documented in ``docs/metrics.md``:
 
 - ``def``s nested inside a method body are collected as methods of the
-  enclosing class (the original's ``visit_FunctionDef`` calls
-  ``generic_visit``, which re-dispatches on every nested function).
-- a ``class`` nested inside a *method* body is processed twice -- once
-  while descending that method, once by the module-level ``ast.walk`` --
-  and while it is processed ``curr_class`` is repointed at it and never
-  restored, so later attribute writes in that method land on the nested
-  class.
+  enclosing class -- descending into a method re-dispatches on every
+  nested function.
+- a ``class`` nested inside a *method* body is recorded twice (once while
+  descending the method, once by the module-level ``ast.walk``), and
+  while its body is processed ``self._current`` is repointed at it and
+  never restored, so later attribute writes in that method land on the
+  nested class.
 
-Phase 5 fixes already applied here: ``async def`` methods are recognised
-(item 5); ``x: int = 0`` / ``x += 1`` class attributes are seen (item 7);
-dotted bases ``class Foo(pkg.Base)`` are recorded as ``Base`` (item 9).
-Only positional args are counted per method.
+Handled correctly: ``async def`` methods; ``x: int = 0`` / ``x += 1``
+class attributes; dotted bases (``class Foo(pkg.Base)`` -> ``Base``).
+Only positional parameters are counted per method.
 """
 
 from __future__ import annotations

@@ -1,6 +1,5 @@
-"""Shared fixture/snapshot locations for both the legacy and new engine
-golden-snapshot tests.
-"""
+"""Shared locations for the fixture projects and their committed
+golden snapshots."""
 
 from __future__ import annotations
 

@@ -97,15 +97,23 @@ def render_metrics_markdown() -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
-DOCS_PATH = Path(__file__).resolve().parents[2] / "docs" / "metrics.md"
+def _repo_docs_path() -> Path:
+    """`<repo>/docs/metrics.md` when running from a source checkout."""
+    repo_root = Path(__file__).resolve().parents[2]
+    if not (repo_root / "pyproject.toml").is_file():
+        raise RuntimeError(
+            "docs/metrics.md can only be regenerated from a source checkout "
+            "(no pyproject.toml found above this package)"
+        )
+    return repo_root / "docs" / "metrics.md"
 
 
 def write() -> Path:
-    DOCS_PATH.parent.mkdir(exist_ok=True)
-    DOCS_PATH.write_text(render_metrics_markdown(), encoding="utf-8")
-    return DOCS_PATH
+    path = _repo_docs_path()
+    path.parent.mkdir(exist_ok=True)
+    path.write_text(render_metrics_markdown(), encoding="utf-8")
+    return path
 
 
 if __name__ == "__main__":  # pragma: no cover
-    path = write()
-    print(f"wrote {path}")
+    print(f"wrote {write()}")
