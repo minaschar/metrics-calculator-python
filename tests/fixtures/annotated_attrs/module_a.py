@@ -1,8 +1,8 @@
-"""Class attributes declared with annotations / augmented assignment.
+"""Class attributes declared with annotations and augmented assignment.
 
-The pre-rewrite engine only inspected plain `ast.Assign`, so `limit`,
-`name`, `seen` and the in-method `self.cache` annotation were all missed,
-under-reporting WAC and SIZE2 (Phase 5, item 7).
+`limit` (annotated), `name` (bare annotation), `seen` (plain), `Config.seen`
+and `self.cache` (annotated, in a method) are all fields, so `Config` has
+WAC 5 / SIZE2 6.
 """
 
 

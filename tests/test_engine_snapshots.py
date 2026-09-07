@@ -2,12 +2,9 @@
 
 Each fixture under ``tests/fixtures/<name>/`` is analysed and its full
 per-class metric table compared against ``tests/snapshots/<name>.json``.
-
-Through Phases 0-4 these snapshots captured the *legacy* engine's output
-and this suite proved the rewrite reproduced it byte for byte. From Phase
-5 on they track the *new* engine: each deliberate bug fix regenerates the
-affected snapshots in its own commit, so the diff shows exactly which
-measured values moved and why.
+A deliberate change to what a metric counts regenerates the affected
+snapshots in the same commit, so its diff shows exactly which measured
+values moved and why.
 
 Run with ``SNAPSHOT_UPDATE=1`` to (re)write snapshots after a reviewed
 change. Never hand-edit a snapshot file.

@@ -28,7 +28,6 @@ gui = ["pyside6-essentials>=6.7"]
 
 [project.urls]
 Repository = "https://github.com/minaschar/metrics-calculator-python"
-Changelog = "https://github.com/minaschar/metrics-calculator-python/blob/master/CHANGELOG.md"
 
 [project.scripts]
 metrics-calculator = "metrics_calculator.cli.app:app"

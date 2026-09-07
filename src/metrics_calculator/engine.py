@@ -53,16 +53,15 @@ def _build_index(files: list[FileFacts]) -> _ProjectIndex:
 
 
 def _count_children(target: ClassFacts, index: _ProjectIndex) -> int:
-    """`return_children`: concatenate every class's simple base names
-    across the whole project (duplicate class entries for a method-nested
-    class included) and count how many equal this class's name."""
+    """How many times this class's name appears as a base across the whole
+    project. Counts each occurrence, so a class listing the same base
+    twice (or a duplicated method-nested class entry) counts twice."""
     return sum(1 for c in index.classes for name in c.base_names if name == target.name)
 
 
 def _resolve_parents(target: ClassFacts, index: _ProjectIndex) -> list[ClassFacts]:
-    """`convert_to_actual_parent_objects`: project discovery order, one
-    entry per (class, matching base name) pair -- so a class listed under
-    two of `target`'s bases, or a duplicate class entry, appears twice."""
+    """Project classes matching this class's declared base names, in
+    discovery order, one entry per (class, matching base) pair."""
     return [c for c in index.classes for name in target.base_names if c.name == name]
 
 
@@ -72,14 +71,10 @@ def _depth_of_inheritance(
     cache: dict[int, int],
     visiting: frozenset[int] = frozenset(),
 ) -> int:
-    """DIT as a pure function of the class and its ancestors (brief Phase
-    5, items 1-2).
-
-    ``dit(C)`` is 0 for a class with no project-internal base, otherwise
-    ``1 + max(dit(p))`` over its project-internal bases. It no longer
-    depends on iteration order, on which class a write happens to land on,
-    or on whether ``C`` has children. An inheritance cycle is broken by
-    treating the already-visited class as depth 0.
+    """DIT as a pure function of the class and its ancestors: 0 when no
+    base resolves to a project class, otherwise ``1 + max(dit(p))`` over
+    the project bases. Independent of iteration order and of whether the
+    class has children; an inheritance cycle contributes 0.
     """
     cached = cache.get(id(target))
     if cached is not None:
@@ -151,11 +146,12 @@ def analyze(
     *,
     on_progress: Callable[[int, int], None] | None = None,
 ) -> ProjectMetrics:
-    """Analyzes every Python file under `root`.
+    """Analyse every Python file under ``root`` and return the per-class
+    metric table.
 
-    `on_progress`, if given, is called as `on_progress(completed, total)`
-    once per file after its classes' metrics are computed -- e.g. for a
-    CLI progress bar or a future GUI's progress signal. This is the only
+    ``on_progress``, if given, is called as ``on_progress(completed,
+    total)`` once per file after its classes are computed -- for a CLI
+    progress bar or the desktop app's progress signal. It is the only
     concession to a caller's UI; nothing here imports or assumes one.
     """
     root = Path(root)

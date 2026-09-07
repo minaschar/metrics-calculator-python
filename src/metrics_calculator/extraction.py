@@ -1,23 +1,21 @@
 """Structural facts pulled from a parsed module: classes, their methods,
-fields and declared base names. This is the "first pass" the rest of the
-engine builds on -- it does not compute any metric itself.
+fields and declared base names. The first pass the rest of the engine
+builds on -- it computes no metric itself.
 
-Two long-standing quirks of the analysis are preserved deliberately (they
-are not in the fixed-defect list and changing them would move measured
-values); both are documented in ``docs/metrics.md``:
+Scope notes, all reflected in ``docs/metrics.md``:
 
-- ``def``s nested inside a method body are collected as methods of the
-  enclosing class -- descending into a method re-dispatches on every
-  nested function.
-- a ``class`` nested inside a *method* body is recorded twice (once while
-  descending the method, once by the module-level ``ast.walk``), and
-  while its body is processed ``self._current`` is repointed at it and
-  never restored, so later attribute writes in that method land on the
-  nested class.
-
-Handled correctly: ``async def`` methods; ``x: int = 0`` / ``x += 1``
-class attributes; dotted bases (``class Foo(pkg.Base)`` -> ``Base``).
-Only positional parameters are counted per method.
+- A method is any ``def`` / ``async def`` whose name appears in the class,
+  functions nested inside a method body included; same-named definitions
+  collapse to one.
+- A class defined inside a *method* body is recorded twice -- once while
+  that method is walked, once by the module-level ``ast.walk`` -- and
+  while its body is processed the "current class" is repointed at it, so
+  attribute writes later in that method are attributed to the nested
+  class. This is a deliberate, documented quirk, not a bug to fix here.
+- Only ``ast.Name`` and ``ast.Attribute`` bases are recognised
+  (``class Foo(pkg.Base)`` -> ``"Base"``); only positional parameters are
+  counted per method; fields are found syntactically, from plain,
+  annotated and augmented assignments only.
 """
 
 from __future__ import annotations
@@ -55,10 +53,8 @@ class FileFacts:
 
 
 def _base_names(node: ast.ClassDef) -> tuple[str, ...]:
-    # `class Foo(Base)` -> "Base"; `class Foo(pkg.mod.Base)` -> "Base"
-    # (Phase 5, item 9 -- the dotted-base case the original left
-    # commented out). Anything more exotic (a subscript, a call) is
-    # skipped.
+    # `class Foo(Base)` -> "Base"; `class Foo(pkg.mod.Base)` -> "Base".
+    # Anything more exotic (a subscript, a call) is skipped.
     names: list[str] = []
     for base in node.bases:
         if isinstance(base, ast.Name):
@@ -69,8 +65,8 @@ def _base_names(node: ast.ClassDef) -> tuple[str, ...]:
 
 
 class _ClassLevelFieldCollector(ast.NodeVisitor):
-    """`ClassAttrNodeVisitor`: every `Store` name anywhere under a
-    class-body `ast.Assign` becomes `ClassName.<name>`."""
+    """Every `Store` name anywhere under a class-body assignment becomes
+    a `ClassName.<name>` field."""
 
     def __init__(self, class_name: str, fields: set[str]) -> None:
         self._class_name = class_name
@@ -82,12 +78,9 @@ class _ClassLevelFieldCollector(ast.NodeVisitor):
 
 
 class _StructureVisitor(ast.NodeVisitor):
-    """Port of ``InitCommonsNodeVisitor``.
-
-    Run once over a module. ``classes`` ends up holding one ``ClassFacts``
-    per ``visit_ClassDef`` call, in the same order and with the same
-    multiplicity the original tool's ``python_file.classes`` list had.
-    """
+    """Run once over a module. ``classes`` ends up with one ``ClassFacts``
+    per ``visit_ClassDef`` call, in ``ast.walk`` order (a method-nested
+    class therefore appears twice -- see the module docstring)."""
 
     def __init__(self, file_name: str) -> None:
         self._file_name = file_name
@@ -113,16 +106,16 @@ class _StructureVisitor(ast.NodeVisitor):
             if isinstance(child, _FUNC_DEFS):
                 self._visit_func(child)
             elif isinstance(child, ast.Assign | ast.AnnAssign | ast.AugAssign):
-                # `x = ...`, and (Phase 5, item 7) `x: int = 0` / `x += 1`.
+                # `x = ...`, `x: int = 0`, `x += 1`
                 class_level.generic_visit(child)
 
     def _visit_func(self, node: _FuncDef) -> None:
         assert self._current is not None
         params = tuple(arg.arg for arg in node.args.args)
         self._current.methods[node.name] = MethodInfo(node.name, params)
-        # Re-dispatches visit_FunctionDef / visit_AsyncFunctionDef /
-        # visit_ClassDef / visit_Attribute on descendants, exactly as the
-        # original's generic_visit did.
+        # Descend: nested `def`s become methods too, a nested class
+        # repoints `self._current`, and `self.x = ...` writes are picked
+        # up by visit_Attribute.
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
@@ -144,8 +137,8 @@ class _StructureVisitor(ast.NodeVisitor):
 
 def extract_classes(file_facts: FileFacts) -> list[ClassFacts]:
     """Every class in the module, nested ones included, in ``ast.walk``
-    order -- with a method-nested class appearing twice, matching the
-    original tool."""
+    order (a method-nested class appears twice -- see the module
+    docstring)."""
     visitor = _StructureVisitor(file_facts.path.name)
     visitor.visit_Module(file_facts.module_ast)
     return visitor.classes

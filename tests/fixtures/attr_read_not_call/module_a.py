@@ -1,9 +1,8 @@
 """Attribute read passed as an argument, not called.
 
-`scheduler.run` is a bound-method *reference* handed to `register(...)`,
-not a call. The pre-rewrite MethodsCalledNodeVisitor walked every Call's
-whole subtree and recorded `scheduler.run` anyway (because `run` is a
-method name in the project), inflating MPC and CBO (Phase 5, item 4).
+`scheduler.run` is a bound-method reference handed to `register(...)` and
+also just returned -- neither is a call -- so `App` has MPC 0 and is not
+coupled to `Scheduler` through it.
 """
 
 

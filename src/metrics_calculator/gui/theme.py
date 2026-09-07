@@ -1,9 +1,8 @@
 """Palette and Qt stylesheet, light and dark.
 
-Seeded from the original tool's colours -- deep blue ``#224562`` and
-Python yellow ``#FFD43B`` -- but reworked into a full token set with
-readable contrast in both modes instead of inline ``setStyleSheet``
-strings repeated per widget.
+A single token set (deep blue ``#224562``, Python yellow ``#FFD43B``,
+plus neutrals) with readable contrast in both modes, applied as one
+stylesheet rather than per-widget ``setStyleSheet`` calls.
 """
 
 from __future__ import annotations

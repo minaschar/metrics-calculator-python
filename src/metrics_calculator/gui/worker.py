@@ -1,10 +1,8 @@
 """Runs :func:`metrics_calculator.analyze` off the UI thread.
 
-The old GUI called the analysis inline in a button handler, so the window
-froze for the entire run with no progress and no way to stop it. Here the
-work lives on a :class:`QObject` that is moved to a :class:`QThread`;
-progress is reported per file and cancellation is checked at the same
-granularity.
+The work lives on a :class:`QObject` moved to a :class:`QThread`;
+progress is reported per file and a cancel request is checked at the
+same granularity.
 """
 
 from __future__ import annotations

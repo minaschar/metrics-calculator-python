@@ -1,12 +1,9 @@
 """The in-app metrics manual, generated from the registry.
 
-The original tool hand-built a 624-line window from ``label_2`` through
-``label_56`` with every metric description pasted into layout code. Here
-the manual is derived from :data:`METRIC_REGISTRY`,
-:data:`PROJECT_METRIC_REGISTRY` and :data:`UNIMPLEMENTED_METRICS` --
-adding a metric to the registry adds it to the manual (and to
-``docs/metrics.md``) with no further work. Qt-free so it can be tested
-directly.
+Derived from :data:`METRIC_REGISTRY`, :data:`PROJECT_METRIC_REGISTRY` and
+:data:`UNIMPLEMENTED_METRICS`: adding a metric to the registry adds it to
+the manual (and to ``docs/metrics.md``) with no further work. Qt-free so
+it can be tested directly.
 """
 
 from __future__ import annotations

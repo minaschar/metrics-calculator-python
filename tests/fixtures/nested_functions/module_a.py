@@ -1,10 +1,9 @@
 """A method with functions nested in its body.
 
-The pre-rewrite engine's InitCommonsNodeVisitor descends into method
-bodies and counts every nested `def` as a method of the class, so NOM for
-`Widget` is 4 (`build`, `_step`, `_finish`, `run`), not 2. LCOM's shared
-accumulator also leaks `self.total` out of `_step`, and the
-`helper.collect()` call made from `run` couples Widget to Registry.
+Nested `def`s count as methods, so `Widget` has NOM 4 (`build`, `_step`,
+`_finish`, `run`). `_step`'s `self.total` use does not leak into `build`'s
+cohesion set (LCOM 1), and `run`'s `helper.collect()` couples `Widget` to
+`Registry`.
 """
 
 

@@ -143,11 +143,39 @@ uv run pyinstaller --clean --noconfirm packaging/metrics-calculator-gui.spec
 # -> dist/MetricsCalculator[.exe]
 ```
 
-### More
+### Package layout
 
-Architecture, the package layout and how to add a metric (one registry entry) are
-in [CONTRIBUTING.md](CONTRIBUTING.md). Release notes are in
-[CHANGELOG.md](CHANGELOG.md).
+```
+src/metrics_calculator/
+  __init__.py     public API: analyze(), the result dataclasses, the registry
+  engine.py       orchestration: discover -> extract -> compute per class
+  discovery.py    file walk + parse, skipped files reported as diagnostics
+  extraction.py   structural facts per class (methods, fields, bases)
+  analysis/       one module per metric family (loc, complexity, cohesion, method_calls)
+  registry.py     one entry per metric: name, category, description, formula, source
+  reporting.py    ProjectMetrics -> csv / json / html / xlsx (shared with the GUI)
+  thresholds.py   --fail-under parsing + evaluation
+  docs.py         regenerates docs/metrics.md from the registry
+  cli/            Typer command-line app
+  gui/            PySide6 desktop app (imports nothing back into the core)
+tests/
+  fixtures/<name>/       tiny sample projects analysed by the snapshot suite
+  snapshots/<name>.json   the expected per-class table for each fixture
+```
+
+### Adding or changing a metric
+
+- **New metric:** add a field to the relevant dataclass in `results.py`, compute
+  it in `engine.py` (or a new `analysis/` module), and add **one**
+  `MetricDefinition` to `registry.py` (`formula` = what the code actually does,
+  plus `notes` for any approximation). The CLI table, every export format, the
+  desktop manual and `docs/metrics.md` pick it up automatically. Then run the two
+  regen commands above.
+- **Changed value:** metric semantics are otherwise frozen. Add a failing test,
+  make the fix, regenerate the affected snapshots, and show the snapshot diff in
+  the commit.
+- The public abbreviations (LOC, NOM, SIZE2, WAC, NOCC, DIT, WMPC1, WMPC2, RFC,
+  CBO, MPC, LCOM, NOC) are research vocabulary — never rename them.
 
 ---
 

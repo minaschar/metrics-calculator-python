@@ -35,12 +35,11 @@ class CohesionMetrics:
     lcom: int = 0
 
 
-# Phase 5, item 10: the original declared a QMOOD category with six
-# Bansiya & Davis (2002) design attributes (reusability, flexibility,
-# understandability, functionality, extendability, effectiveness) that
-# nothing ever computed -- always 0.0, never displayed. They are dropped
-# here rather than carried as dead fields; implementing QMOOD properly is
-# recorded as future work (see the roadmap / CHANGELOG).
+# The QMOOD design-quality attributes (reusability, flexibility,
+# understandability, functionality, extendability, effectiveness) are not
+# computed and are not carried as dead always-zero fields. A real QMOOD
+# implementation is future work -- see the README's "Not implemented"
+# section and docs/metrics.md.
 
 
 @dataclass(slots=True)

@@ -2,9 +2,8 @@
 
 Only QtWidgets/QtGui are used -- no QtCharts, no matplotlib -- so the app
 stays inside ``pyside6-essentials`` and renders identically headless. The
-histogram is enough for the job the brief asks of it: show a metric's
-distribution across the project, mark the threshold, and pick out the
-outlier tail.
+histogram shows a metric's distribution across the project, marks the
+threshold, and picks out the outlier tail.
 """
 
 from __future__ import annotations

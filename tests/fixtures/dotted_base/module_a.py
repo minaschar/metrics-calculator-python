@@ -1,10 +1,8 @@
-"""Dotted base class.
+"""Dotted base classes.
 
-`Handler` inherits from `abc.ABC` and from the project-local
-`base.Component`. The pre-rewrite HierarchyNodeVisitor ignored
-`ast.Attribute` bases entirely, so `Handler` looked like a root (Phase 5,
-item 9). Now `abc.ABC` -> "ABC" and `base.Component` -> "Component", so
-Handler is a child of the project's Component and DIT/NOCC follow.
+`abc.ABC` -> "ABC" and the project-local `base.Component` -> "Component",
+so `Handler` is a child of `Component`: `Handler` DIT is 1 and
+`Component` NOCC is 1.
 """
 import abc
 

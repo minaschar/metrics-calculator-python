@@ -12,14 +12,9 @@ _NESTED_SCOPES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
 def _method_field_uses(
     node: ast.FunctionDef | ast.AsyncFunctionDef, known: frozenset[str]
 ) -> frozenset[str]:
-    """Fields (`self.x`, `Klass.x`) touched directly in this method's
-    body.
-
-    Phase 5, items 5-6: `async def` methods are handled, and the walk
-    stops at any nested function or class -- their attribute uses belong
-    to their own scope, not this method's cohesion (the original shared
-    one accumulator across methods and merely cleared it, letting nested
-    scopes leak).
+    """The known fields (`self.x`, `Klass.x`) referenced directly in this
+    method's body. The walk stops at any nested function or class: their
+    attribute use belongs to their own scope, not this method's cohesion.
     """
     used: set[str] = set()
     stack: list[ast.AST] = list(ast.iter_child_nodes(node))

@@ -56,9 +56,7 @@ def _find_python_files(root: Path, config: AnalysisConfig) -> list[Path]:
             if not any(rx.match(p.relative_to(root).as_posix()) for rx in patterns)
         }
 
-    # Sorted for deterministic, reproducible runs. The original tool relied
-    # on os.walk's (OS-dependent, unspecified) directory order, which was
-    # never a stable contract to begin with.
+    # Sorted so a run is deterministic and reproducible across machines.
     return sorted(matched)
 
 

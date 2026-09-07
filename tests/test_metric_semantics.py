@@ -1,9 +1,8 @@
-"""Behavioural checks for the Phase 5 bug fixes.
+"""Focused checks on what each metric counts.
 
-The golden snapshots pin the exact numbers for each fixture; these tests
-state the *intent* of each fix in isolation and cover the two things a
-fixture snapshot can't easily show -- the inheritance-cycle guard and the
-default directory excludes.
+The golden snapshots pin the exact numbers per fixture; these state the
+intent in isolation and cover two things a fixture snapshot can't easily
+show -- the inheritance-cycle guard and the default directory excludes.
 """
 
 from __future__ import annotations
@@ -11,7 +10,6 @@ from __future__ import annotations
 import textwrap
 from pathlib import Path
 
-import pytest
 from _paths import FIXTURES_DIR
 
 from metrics_calculator import AnalysisConfig, ClassMetrics, analyze
@@ -51,25 +49,28 @@ def test_dit_survives_inheritance_cycle(tmp_path: Path) -> None:
 
 
 def test_mpc_counts_each_call_site_once() -> None:
-    # `save` is defined in two files; the caller has two call sites. The
-    # pre-fix engine gave MPC 4 (2 sites x 2 defining files).
+    # `save` is defined in two files and `Client` has two `store.save(...)`
+    # call sites: MPC is the number of call sites, not sites x definitions.
     client = _by_class(FIXTURES_DIR / "mpc_cross_file")["Client"]
     assert client.coupling.mpc == 2
 
 
-def test_async_methods_are_visible() -> None:
+def test_async_methods_are_counted() -> None:
     fetcher = _by_class(FIXTURES_DIR / "async_methods")["Fetcher"]
-    assert fetcher.size.nom == 3  # was 1 (only the sync method)
+    assert fetcher.size.nom == 3  # two async methods + one sync
 
 
 def test_lcom_does_not_leak_across_nested_functions() -> None:
+    # `_step` (nested in `build`) touches `self.total`; that use belongs to
+    # `_step`'s scope, not `build`'s, so `build` and `run` share no field.
     widget = _by_class(FIXTURES_DIR / "nested_functions")["Widget"]
-    assert widget.cohesion.lcom == 1  # was 4 (nested `_step`'s self.total leaked)
+    assert widget.cohesion.lcom == 1
 
 
 def test_annotated_and_augmented_class_attributes_are_counted() -> None:
+    # limit:int, name:str, seen, Config.seen (in bump), self.cache
     config = _by_class(FIXTURES_DIR / "annotated_attrs")["Config"]
-    assert config.size.wac == 5  # limit:int, name:str, seen, self.seen, self.cache
+    assert config.size.wac == 5
 
 
 def test_dotted_base_class_is_resolved() -> None:
@@ -79,8 +80,9 @@ def test_dotted_base_class_is_resolved() -> None:
 
 
 def test_attribute_read_is_not_a_method_call() -> None:
+    # `register(scheduler.run)` and `return scheduler.run` are reads, not calls.
     app = _by_class(FIXTURES_DIR / "attr_read_not_call")["App"]
-    assert app.coupling.mpc == 0  # `register(scheduler.run)` is a read, not a call
+    assert app.coupling.mpc == 0
 
 
 def test_default_config_excludes_vendored_and_cache_dirs(tmp_path: Path) -> None:
@@ -97,8 +99,8 @@ def test_default_config_excludes_vendored_and_cache_dirs(tmp_path: Path) -> None
     assert result.noc == 1
 
 
-@pytest.mark.parametrize("removed", ["QmoodMetrics"])
-def test_qmood_type_is_gone(removed: str) -> None:
+def test_qmood_is_not_in_the_public_api() -> None:
     import metrics_calculator
 
-    assert not hasattr(metrics_calculator, removed)
+    assert not hasattr(metrics_calculator, "QmoodMetrics")
+    assert "qmood" not in metrics_calculator.ClassMetrics.__dataclass_fields__

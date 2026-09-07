@@ -7,11 +7,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 DEFAULT_INCLUDE: tuple[str, ...] = ("**/*.py",)
-# Phase 5, item 8: the pre-rewrite engine walked every .py file it found,
-# including the analysed project's own virtualenv, vendored packages and
-# caches -- which polluted NOC and every project-wide name lookup. These
-# directories are now skipped by default; a config can override `exclude`
-# to change the set.
+# Skipped by default: an analysed project's own virtualenv, vendored
+# packages and tool caches would otherwise inflate NOC and pollute
+# project-wide name resolution. Override `exclude` in config to change
+# the set.
 DEFAULT_EXCLUDE: tuple[str, ...] = (
     "**/.git/**",
     "**/.hg/**",

@@ -1,11 +1,9 @@
 """A class defined inside a method body.
 
-The pre-rewrite engine processes `Cache` twice -- once while descending
-`Outer.configure`, once from the module-level `ast.walk` -- so the
-project ends up with two `Cache` entries, and while the first is being
-processed `curr_class` is repointed at it and never restored, so
-`self.dirty = True` (written after the nested class) lands on `Cache`
-rather than `Outer`.
+`Cache` is recorded twice (NOC 3 for two source classes), and because the
+"current class" is repointed at `Cache` while its body is walked, the
+`self.cache` / `self.dirty` writes after it are attributed to `Cache`,
+not `Outer`. A deliberate, documented quirk of the extraction pass.
 """
 
 

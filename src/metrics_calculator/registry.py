@@ -210,8 +210,7 @@ PROJECT_METRIC_DEFINITIONS: tuple[ProjectMetricDefinition, ...] = (
         "Chidamber & Kemerer (1994)",
         "count of class definitions discovered in all analysed files",
         lambda pm: pm.noc,
-        notes="A class defined inside a method body is counted twice, matching the original "
-        "tool's discovery.",
+        notes="A class defined inside a method body is counted twice (see the extraction notes).",
     ),
 )
 
@@ -245,7 +244,7 @@ UNIMPLEMENTED_METRICS: tuple[UnimplementedMetric, ...] = tuple(
         name.replace("_", " ").title(),
         "qmood",
         "Bansiya & Davis (2002)",
-        "Declared by the original tool but never computed; kept here as documented future work.",
+        "Part of the QMOOD model; not computed by this tool. Listed as future work.",
     )
     for name in _UNIMPLEMENTED_QMOOD
 )

@@ -120,49 +120,49 @@ Non-cohesive minus cohesive method pairs (by shared field use), floored at zero.
 Total number of classes found across the analyzed project.
 
 - **As implemented:** count of class definitions discovered in all analysed files
-- **Approximation:** A class defined inside a method body is counted twice, matching the original tool's discovery.
+- **Approximation:** A class defined inside a method body is counted twice (see the extraction notes).
 - **Source:** Chidamber & Kemerer (1994)
 
 ## QMOOD design attributes (not implemented)
 
 ### Reusability
 
-Declared by the original tool but never computed; kept here as documented future work.
+Part of the QMOOD model; not computed by this tool. Listed as future work.
 
 - **Status:** not computed by this release.
 - **Source:** Bansiya & Davis (2002)
 
 ### Flexibility
 
-Declared by the original tool but never computed; kept here as documented future work.
+Part of the QMOOD model; not computed by this tool. Listed as future work.
 
 - **Status:** not computed by this release.
 - **Source:** Bansiya & Davis (2002)
 
 ### Understandability
 
-Declared by the original tool but never computed; kept here as documented future work.
+Part of the QMOOD model; not computed by this tool. Listed as future work.
 
 - **Status:** not computed by this release.
 - **Source:** Bansiya & Davis (2002)
 
 ### Functionality
 
-Declared by the original tool but never computed; kept here as documented future work.
+Part of the QMOOD model; not computed by this tool. Listed as future work.
 
 - **Status:** not computed by this release.
 - **Source:** Bansiya & Davis (2002)
 
 ### Extendability
 
-Declared by the original tool but never computed; kept here as documented future work.
+Part of the QMOOD model; not computed by this tool. Listed as future work.
 
 - **Status:** not computed by this release.
 - **Source:** Bansiya & Davis (2002)
 
 ### Effectiveness
 
-Declared by the original tool but never computed; kept here as documented future work.
+Part of the QMOOD model; not computed by this tool. Listed as future work.
 
 - **Status:** not computed by this release.
 - **Source:** Bansiya & Davis (2002)

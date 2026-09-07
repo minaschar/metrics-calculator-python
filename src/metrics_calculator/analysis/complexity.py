@@ -52,8 +52,10 @@ class _CyclomaticComplexityVisitor(ast.NodeVisitor):
 
 
 def cyclomatic_complexity(node: ast.ClassDef) -> int:
-    """Sums a rough per-method cyclomatic complexity across the class.
-    `async def` methods are included (Phase 5, item 5)."""
+    """Sum of an approximate per-method cyclomatic complexity across the
+    class: 1 per method (``def`` or ``async def``, nested ones included)
+    plus 1 for each branch/loop/comprehension clause and one per ``match``
+    case. Boolean operators, ``except`` and ``assert`` are not counted."""
     visitor = _CyclomaticComplexityVisitor()
     visitor.visit_ClassDef(node)
     return visitor.complexity
