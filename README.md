@@ -194,12 +194,10 @@ tests/
 
 ## Not implemented (future work)
 
-- **QMOOD design-quality attributes** (Bansiya & Davis 2002). The original tool
-  declared six of them but never computed them; they were removed rather than
-  kept as always-zero fields, and are listed as future work.
-- **Technical-debt scoring.** No such model has ever existed in this codebase,
-  despite an earlier project blurb; the GitHub repository description should be
-  updated to drop that claim.
+- **QMOOD design-quality attributes** (Bansiya & Davis 2002): reusability,
+  flexibility, understandability, functionality, extendability, effectiveness.
+  Not computed; listed in `docs/metrics.md` for completeness.
+- **Technical-debt scoring.** There is no technical-debt model in this tool.
 
 ## Licence
 

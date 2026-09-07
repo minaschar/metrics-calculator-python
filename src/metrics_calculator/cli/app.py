@@ -9,6 +9,7 @@ import typer
 from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, SpinnerColumn, TextColumn
 from rich.table import Table
+from rich.text import Text
 
 from ..config import AnalysisConfig
 from ..engine import analyze
@@ -46,8 +47,8 @@ def _render_table(project_metrics_rows: list[dict[str, object]], project_name: s
 
     for row in project_metrics_rows:
         table.add_row(
-            str(row["file_name"]),
-            str(row["class_name"]),
+            Text(str(row["file_name"])),
+            Text(str(row["class_name"])),
             *(str(row[abbreviation]) for abbreviation in METRIC_REGISTRY),
         )
     console.print(table)
@@ -98,7 +99,7 @@ def analyze_command(
                 metric, limit = parse_threshold_option(raw)
                 thresholds[metric] = limit
         except ValueError as exc:
-            error_console.print(f"error: {exc}")
+            error_console.print(Text(f"error: {exc}"))
             raise typer.Exit(code=2) from exc
 
     if no_progress:
@@ -119,7 +120,7 @@ def analyze_command(
             result = analyze(path, config, on_progress=_on_progress)
 
     for diagnostic in result.diagnostics:
-        error_console.print(str(diagnostic), style="yellow")
+        error_console.print(Text(str(diagnostic), style="yellow"))
 
     rendered: str | None
     if output_format == "table":
@@ -146,7 +147,7 @@ def analyze_command(
 
     violations = check_thresholds(result, thresholds) if thresholds else []
     for violation in violations:
-        error_console.print(str(violation), style="red")
+        error_console.print(Text(str(violation), style="red"))
 
     if violations:
         raise typer.Exit(code=1)
@@ -201,10 +202,12 @@ def diff_command(
         console.print("No differences.")
         raise typer.Exit(code=0)
 
+    # `Text(...)` rather than markup strings: a class or file name is
+    # arbitrary text and must not be parsed as Rich style tags.
     for file_name, class_name in diff.added_classes:
-        console.print(f"[green]+ {file_name}:{class_name}[/green]")
+        console.print(Text(f"+ {file_name}:{class_name}", style="green"))
     for file_name, class_name in diff.removed_classes:
-        console.print(f"[red]- {file_name}:{class_name}[/red]")
+        console.print(Text(f"- {file_name}:{class_name}", style="red"))
 
     if diff.changed:
         table = Table(title="Changed metrics")
@@ -217,12 +220,12 @@ def diff_command(
         for change in diff.changed:
             style = "red" if change.delta > 0 else "green"
             table.add_row(
-                change.file_name,
-                change.class_name,
-                change.metric,
+                Text(change.file_name),
+                Text(change.class_name),
+                Text(change.metric),
                 str(change.old),
                 str(change.new),
-                f"[{style}]{change.delta:+g}[/{style}]",
+                Text(f"{change.delta:+g}", style=style),
             )
         console.print(table)
 

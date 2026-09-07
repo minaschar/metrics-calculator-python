@@ -1,6 +1,6 @@
-"""CLI-level checks: exit codes, and that machine-readable output on
-stdout is emitted verbatim (Rich must not treat a bracketed substring in
-a name as a style tag)."""
+"""CLI-level checks: exit codes, and that a name is never treated as a
+Rich style tag -- neither in machine-readable stdout nor in the diff /
+table renderings."""
 
 from __future__ import annotations
 
@@ -60,3 +60,24 @@ def test_diff_same_project_is_clean(project: Path) -> None:
     result = runner.invoke(app, ["diff", str(project), str(project)])
     assert result.exit_code == 0
     assert "No differences" in result.stdout
+
+
+def test_diff_renders_bracket_names_verbatim(tmp_path: Path) -> None:
+    old = tmp_path / "old"
+    new = tmp_path / "new"
+    old.mkdir()
+    new.mkdir()
+    # `[dim]` is a valid Rich style tag; the name must print verbatim.
+    (old / "a.py").write_text("class Gone:\n    def m(self): pass\n", encoding="utf-8")
+    (new / "b[dim].py").write_text("class Added:\n    def m(self): pass\n", encoding="utf-8")
+
+    result = runner.invoke(app, ["diff", str(old), str(new)])
+    assert result.exit_code == 1  # added/removed classes
+    assert not isinstance(result.exception, Exception)  # a MarkupError would be one
+    assert "b[dim].py:Added" in result.stdout
+
+
+def test_analyze_table_renders_bracket_names(project: Path) -> None:
+    result = runner.invoke(app, ["analyze", str(project), "--no-progress"])
+    assert result.exit_code == 0
+    assert not isinstance(result.exception, Exception)
