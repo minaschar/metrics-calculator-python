@@ -73,6 +73,12 @@ colouring, plus per-metric distribution histograms, drill-down from a class to
 its source, a diagnostics panel and a registry-generated metrics manual.
 Light / dark theme, remembered between runs.
 
+| Per-class results table | Filter + export |
+|---|---|
+| ![Results table](screenshots/screenshot_2.png) | ![Filtering and export menu](screenshots/screenshot_4.png) |
+| **DIT distribution, outliers highlighted** | **Registry-generated metrics manual** |
+| ![Distribution histogram](screenshots/screenshot_3.png) | ![Metrics manual](screenshots/screenshot_1.png) |
+
 ### Python API
 
 ```python
