@@ -11,6 +11,12 @@ always the textbook definition), is in [`docs/metrics.md`](docs/metrics.md).
 It ships three ways to use it: a Python API (`analyze(...)`), a command-line tool
 (`metrics-calculator`), and a desktop app (`metrics-calculator-gui`).
 
+| Per-class results table | Filter + export |
+|---|---|
+| ![Results table](screenshots/screenshot_2.png) | ![Filtering and export menu](screenshots/screenshot_4.png) |
+| **DIT distribution, outliers highlighted** | **Registry-generated metrics manual** |
+| ![Distribution histogram](screenshots/screenshot_3.png) | ![Metrics manual](screenshots/screenshot_1.png) |
+
 ---
 
 ## Run it
@@ -72,12 +78,6 @@ Results land in a sortable / filterable table with threshold and outlier
 colouring, plus per-metric distribution histograms, drill-down from a class to
 its source, a diagnostics panel and a registry-generated metrics manual.
 Light / dark theme, remembered between runs.
-
-| Per-class results table | Filter + export |
-|---|---|
-| ![Results table](screenshots/screenshot_2.png) | ![Filtering and export menu](screenshots/screenshot_4.png) |
-| **DIT distribution, outliers highlighted** | **Registry-generated metrics manual** |
-| ![Distribution histogram](screenshots/screenshot_3.png) | ![Metrics manual](screenshots/screenshot_1.png) |
 
 ### Python API
 
